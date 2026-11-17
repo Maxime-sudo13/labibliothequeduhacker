@@ -4,13 +4,13 @@
 
 🔗 **Site en ligne :** https://maxime-sudo13.github.io/labibliothequeduhacker/
 
-![outils](https://img.shields.io/badge/outils-176-00ff9c) ![commandes](https://img.shields.io/badge/commandes-834-00e5ff) ![catégories](https://img.shields.io/badge/cat%C3%A9gories-16-9d7bff)
+![outils](https://img.shields.io/badge/outils-185-00ff9c) ![commandes](https://img.shields.io/badge/commandes-885-00e5ff) ![catégories](https://img.shields.io/badge/cat%C3%A9gories-17-9d7bff)
 
 ---
 
 ## Qu'est-ce que c'est ?
 
-Une page web **autonome** (un seul fichier `index.html`, aucune dépendance) qui référence **176 outils** de pentest et **834 commandes**, classés en **16 catégories** suivant les étapes d'un test d'intrusion : reconnaissance → scan → énumération web → failles → exploitation → mots de passe → WiFi → MITM → Active Directory → cloud → forensics → reverse → mobile → social → anonymat.
+Une page web **autonome** (un seul fichier `index.html`, aucune dépendance) qui référence **185 fiches** (outils + techniques) et **885 commandes**, classées en **17 catégories** suivant les étapes d'un test d'intrusion : reconnaissance → Google dorking → scan → énumération web → failles → exploitation → mots de passe → WiFi → MITM → Active Directory → cloud → forensics → reverse → mobile → social → anonymat.
 
 ### Fonctionnalités
 

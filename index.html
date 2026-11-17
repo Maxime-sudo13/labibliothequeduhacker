@@ -95,6 +95,7 @@
   .badge{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;padding:3px 8px;border-radius:20px;white-space:nowrap;text-transform:uppercase}
   .badge.std{color:var(--neon);background:rgba(0,255,156,.1);border:1px solid rgba(0,255,156,.3)}
   .badge.add{color:var(--amber);background:rgba(255,179,0,.1);border:1px solid rgba(255,179,0,.3)}
+  .badge.osint{color:var(--vio);background:rgba(157,123,255,.12);border:1px solid rgba(157,123,255,.35)}
   .card .role{color:var(--txt2);font-size:13px;margin-bottom:10px;min-height:36px;line-height:1.45}
   .inst{font-family:var(--mono);font-size:11.5px;background:var(--code);border:1px solid var(--line);
     border-radius:7px;padding:8px 10px;overflow-x:auto;white-space:nowrap;display:flex;align-items:center;gap:7px}
@@ -212,6 +213,7 @@
 <script>
 const CATS=[
  {id:"recon",name:"Reconnaissance & OSINT",ic:"🛰️"},
+ {id:"dork",name:"Google Dorking",ic:"🔎"},
  {id:"scan",name:"Scan & cartographie réseau",ic:"📡"},
  {id:"web",name:"Énumération web",ic:"🌐"},
  {id:"webvuln",name:"Failles & exploitation web",ic:"💉"},
@@ -247,7 +249,7 @@ const URLS={
 "ghidra":"https://github.com/NationalSecurityAgency/ghidra","radare2":"https://github.com/radareorg/radare2","cutter":"https://github.com/rizinorg/cutter","gdb":"https://www.sourceware.org/gdb/","objdump":"https://www.gnu.org/software/binutils/","checksec":"https://github.com/slimm609/checksec.sh","ropper":"https://github.com/sashs/Ropper","ROPgadget":"https://github.com/JonathanSalwan/ROPgadget","pwntools":"https://github.com/Gallopsled/pwntools","strings":"https://www.gnu.org/software/binutils/","ltrace":"https://ltrace.org","strace":"https://github.com/strace/strace","angr":"https://github.com/angr/angr","upx":"https://github.com/upx/upx","pwninit":"https://github.com/io12/pwninit","one_gadget":"https://github.com/david942j/one_gadget",
 "apktool":"https://github.com/iBotPeaches/Apktool","jadx":"https://github.com/skylot/jadx","dex2jar":"https://github.com/pxb1988/dex2jar","frida":"https://github.com/frida/frida","objection":"https://github.com/sensepost/objection","MobSF":"https://github.com/MobSF/Mobile-Security-Framework-MobSF","drozer":"https://github.com/WithSecureLabs/drozer",
 "proxychains4":"https://github.com/rofl0r/proxychains-ng","tor":"https://www.torproject.org","chisel":"https://github.com/jpillora/chisel","ligolo-ng":"https://github.com/nicocha30/ligolo-ng","linpeas":"https://github.com/peass-ng/PEASS-ng","winpeas":"https://github.com/peass-ng/PEASS-ng","socat":"http://www.dest-unreach.org/socat/","sshuttle":"https://github.com/sshuttle/sshuttle","pspy":"https://github.com/DominicBreuker/pspy","macchanger":"https://github.com/alobbs/macchanger"};
-function urlOf(t){return URLS[t.n]||("https://www.kali.org/tools/"+binOf(t)+"/");}
+function urlOf(t){return t.url||URLS[t.n]||("https://www.kali.org/tools/"+binOf(t)+"/");}
 function host(u){try{return u.replace(/^https?:\/\//,'').replace(/\/.*$/,'');}catch(e){return u;}}
 
 const T=[
@@ -369,6 +371,66 @@ const T=[
    {d:"Rechercher",c:"shodan search apache country:FR"},
    {d:"Infos sur une IP",c:"shodan host 8.8.8.8"},
    {d:"Compter les résultats",c:"shodan count product:nginx"}]},
+ {n:"Opérateurs de base",c:"dork",web:true,url:"https://www.google.com/advanced_search",inst:"🔎 Barre de recherche (Google / Bing / DuckDuckGo)",r:"Les briques du Google dorking : cibler un site, une URL, un titre, un type de fichier.",cmds:[
+   {d:"Limiter à un domaine",c:"site:exemple.com"},
+   {d:"Mot présent dans l'URL",c:"inurl:admin"},
+   {d:"Mot dans le titre de la page",c:"intitle:\"index of\""},
+   {d:"Mot dans le texte de la page",c:"intext:\"mot de passe\""},
+   {d:"Filtrer par type de fichier",c:"filetype:pdf"},
+   {d:"Exclure un terme",c:"site:exemple.com -www"},
+   {d:"Combiner (ET / OU)",c:"site:exemple.com (admin | login)"},
+   {d:"Sites similaires",c:"related:exemple.com"},
+   {d:"Deux mots proches",c:"\"admin\" AROUND(3) \"password\""}]},
+ {n:"Répertoires ouverts",c:"dork",web:true,url:"https://www.exploit-db.com/google-hacking-database",inst:"🔎 Barre de recherche",r:"Repérer les listings de dossiers (« index of ») laissés accessibles par erreur.",cmds:[
+   {d:"Listings de répertoires",c:"intitle:\"index of /\""},
+   {d:"Dossiers de sauvegarde",c:"intitle:\"index of\" (backup | bak | old)"},
+   {d:"Exports de bases SQL",c:"intitle:\"index of\" \"*.sql\""},
+   {d:"Dépôt .git exposé",c:"intitle:\"index of\" inurl:\".git\""},
+   {d:"Fichiers de config",c:"intitle:\"index of\" (config | .env | wp-config)"},
+   {d:"Sur un domaine précis",c:"site:exemple.com intitle:\"index of\""}]},
+ {n:"Fichiers sensibles",c:"dork",web:true,url:"https://www.exploit-db.com/google-hacking-database",inst:"🔎 Barre de recherche",r:"Documents, journaux et fichiers de config qui contiennent parfois des secrets.",cmds:[
+   {d:"Variables d'env (.env)",c:"filetype:env \"DB_PASSWORD\""},
+   {d:"Journaux avec mots de passe",c:"filetype:log intext:password"},
+   {d:"Exports SQL",c:"filetype:sql \"INSERT INTO\""},
+   {d:"Tableurs avec e-mails",c:"(filetype:xls | filetype:csv) intext:@exemple.com"},
+   {d:"Fichiers de sauvegarde",c:"(ext:bak | ext:old | ext:backup)"},
+   {d:"Clés privées",c:"intext:\"BEGIN RSA PRIVATE KEY\" filetype:key"},
+   {d:"Documents confidentiels",c:"filetype:pdf \"confidential\" site:exemple.com"}]},
+ {n:"Pages d'administration",c:"dork",web:true,url:"https://www.exploit-db.com/google-hacking-database",inst:"🔎 Barre de recherche",r:"Localiser interfaces de connexion et panneaux d'administration.",cmds:[
+   {d:"Pages de login / admin",c:"inurl:(admin | login | administrator)"},
+   {d:"Admin WordPress",c:"inurl:/wp-admin/ site:exemple.com"},
+   {d:"phpMyAdmin exposé",c:"inurl:phpmyadmin intitle:phpMyAdmin"},
+   {d:"Tableaux de bord",c:"intitle:\"dashboard\" inurl:admin"},
+   {d:"Interfaces cPanel",c:"inurl:cpanel intitle:\"cPanel\""}]},
+ {n:"Fuites de code & secrets",c:"dork",web:true,url:"https://github.com/search",inst:"🔎 Google + recherche GitHub / Pastebin",r:"Chercher identifiants et clés d'API fuités sur les plateformes de code.",cmds:[
+   {d:"Secrets liés à un domaine (GitHub)",c:"site:github.com \"exemple.com\" (password | api_key | token)"},
+   {d:"Clés AWS exposées",c:"\"AKIA\" (filetype:env | site:pastebin.com)"},
+   {d:"Pastebin lié au domaine",c:"site:pastebin.com exemple.com"},
+   {d:"Fichiers .env sur GitHub",c:"site:github.com filename:.env DB_PASSWORD"},
+   {d:"Jetons dans du JavaScript",c:"site:exemple.com filetype:js (apikey | secret | token)"}]},
+ {n:"Sous-domaines & erreurs",c:"dork",web:true,url:"https://www.google.com/advanced_search",inst:"🔎 Barre de recherche",r:"Cartographier la surface : sous-domaines, pages d'erreur et fuites d'infos techniques.",cmds:[
+   {d:"Tous les sous-domaines",c:"site:*.exemple.com"},
+   {d:"Hors www",c:"site:exemple.com -site:www.exemple.com"},
+   {d:"Erreurs SQL indexées",c:"intext:\"sql syntax near\" | intext:\"mysql_fetch\""},
+   {d:"phpinfo exposé",c:"intitle:\"phpinfo()\" \"PHP Version\""},
+   {d:"Traces d'exécution / erreurs",c:"intext:\"stack trace:\" | inurl:error"}]},
+ {n:"Stockage cloud exposé",c:"dork",web:true,url:"https://www.exploit-db.com/google-hacking-database",inst:"🔎 Barre de recherche",r:"Trouver des buckets et espaces de stockage cloud mal configurés.",cmds:[
+   {d:"Buckets Amazon S3",c:"site:s3.amazonaws.com exemple"},
+   {d:"Azure Blob Storage",c:"site:blob.core.windows.net exemple"},
+   {d:"Google Cloud Storage",c:"site:storage.googleapis.com exemple"},
+   {d:"Firebase",c:"site:firebaseio.com exemple"},
+   {d:"DigitalOcean Spaces",c:"site:digitaloceanspaces.com exemple"}]},
+ {n:"OSINT personnes & orga",c:"dork",web:true,url:"https://www.google.com/advanced_search",inst:"🔎 Barre de recherche",r:"Recueillir des infos publiques sur une organisation et ses employés.",cmds:[
+   {d:"Profils LinkedIn d'une société",c:"site:linkedin.com/in \"Exemple SARL\""},
+   {d:"CV exposés",c:"(filetype:pdf | filetype:doc) (cv | \"curriculum vitae\") exemple.com"},
+   {d:"Adresses e-mail du domaine",c:"intext:@exemple.com (filetype:xls | filetype:csv)"},
+   {d:"Documents internes indexés",c:"site:exemple.com (confidentiel | interne | \"ne pas diffuser\")"},
+   {d:"Présence sur les réseaux",c:"\"Exemple SARL\" (site:twitter.com | site:facebook.com)"}]},
+ {n:"Google Hacking Database",c:"dork",web:true,url:"https://www.exploit-db.com/google-hacking-database",inst:"🔎 Ressource en ligne (Exploit-DB)",r:"La base de référence : des milliers de dorks classés et maintenus par la communauté.",cmds:[
+   {d:"Ouvrir la GHDB",c:"https://www.exploit-db.com/google-hacking-database"},
+   {d:"Générateur de dorks visuel",c:"https://dorksearch.com"},
+   {d:"Astuce : tester en navigation privée",c:"évite la personnalisation des résultats"},
+   {d:"Les dorks marchent aussi sur",c:"DuckDuckGo, Bing, Yandex"}]},
  {n:"gobuster",c:"web",std:1,inst:"sudo apt install gobuster",r:"Brute-force de répertoires, fichiers, sous-domaines et vhosts.",cmds:[
    {d:"Répertoires et fichiers",c:"gobuster dir -u http://CIBLE -w wordlist.txt"},
    {d:"Avec extensions",c:"gobuster dir -u http://CIBLE -w wordlist.txt -x php,txt,html"},
@@ -1317,12 +1379,12 @@ function render(){
     html+=`<section class="section" id="sec-${cat.id}"><div class="sechead"><span class="ic">${cat.ic}</span><h2>${cat.name}</h2><span class="cnt">${items.length} outils · ${items.reduce((s,o)=>s+o.t.cmds.length,0)} commandes</span></div><div class="grid">`;
     items.forEach(o=>{
       const t=o.t;store[o.i]=t;
-      const badge=t.std?`<span class="badge std">✓ défaut</span>`:`<span class="badge add">⬇ install</span>`;
-      html+=`<div class="card ${t.std?'':'add'}" data-i="${o.i}">
+      const badge=t.web?`<span class="badge osint">🔎 OSINT</span>`:(t.std?`<span class="badge std">✓ défaut</span>`:`<span class="badge add">⬇ install</span>`);
+      html+=`<div class="card ${(!t.web&&!t.std)?'add':''}" data-i="${o.i}">
         <div class="top"><span class="name">${esc(t.n)}</span><span class="star ${isFav(t.n)?'on':''}" data-fav="${esc(t.n)}">${isFav(t.n)?'★':'☆'}</span>${badge}</div>
         <div class="role">${esc(t.r)}</div>
-        <div class="inst"><span class="lbl">▸</span><span class="v">${esc(t.inst)}</span></div>
-        <div class="cardfoot"><span class="more">⊞ ${t.cmds.length} commandes</span><a class="src" href="${urlOf(t)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${esc(host(urlOf(t)))}</a></div>
+        <div class="inst"><span class="lbl">${t.web?'🔎':'▸'}</span><span class="v">${esc(t.inst)}</span></div>
+        <div class="cardfoot"><span class="more">⊞ ${t.cmds.length} ${t.web?'requêtes':'commandes'}</span><a class="src" href="${urlOf(t)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">↗ ${esc(host(urlOf(t)))}</a></div>
       </div>`;
     });
     html+=`</div></section>`;
@@ -1335,7 +1397,7 @@ function render(){
 let IDX={};
 
 function openModal(t){
-  const badge=t.std?`<span class="badge std mbadge">✓ défaut</span>`:`<span class="badge add mbadge">⬇ à installer</span>`;
+  const badge=t.web?`<span class="badge osint mbadge">🔎 OSINT</span>`:(t.std?`<span class="badge std mbadge">✓ défaut</span>`:`<span class="badge add mbadge">⬇ à installer</span>`);
   const cat=CATS.find(c=>c.id===t.c);
   const rows=t.cmds.map(cm=>`<div class="cmdrow"><div class="d">${esc(cm.d)}</div><div class="cmdline" data-cp="${esc(cm.c)}">${fmtCmd(cm.c)}<span class="cp">copier</span></div></div>`).join("");
   const allTxt=t.cmds.map(cm=>"# "+cm.d+"\n"+cm.c).join("\n\n");
@@ -1345,15 +1407,13 @@ function openModal(t){
       <div class="mcat">${cat.ic} ${esc(cat.name)}</div>
       <h3>${esc(t.n)} <span class="mstar ${isFav(t.n)?'on':''}" id="mstar">${isFav(t.n)?'★':'☆'}</span></h3>
       <div class="mrole">${esc(t.r)}</div>
-      <a class="msrc" href="${urlOf(t)}" target="_blank" rel="noopener">↗ Dépôt / doc officielle — ${esc(host(urlOf(t)))}</a>
+      <a class="msrc" href="${urlOf(t)}" target="_blank" rel="noopener">↗ ${t.web?'Ressource':'Dépôt / doc officielle'} — ${esc(host(urlOf(t)))}</a>
     </div>
     <div class="mbody">
-      <div class="minst" data-cp="${esc(t.inst)}"><span class="lbl">Installation</span><span class="v">${esc(t.inst)}</span><span class="cp" style="opacity:1;position:static">copier</span></div>
-      <div class="mlabrow"><span class="mlab">${t.cmds.length} commandes utiles</span><button class="copyall" id="copyall">⧉ Copier tout</button></div>
+      <div class="minst" data-cp="${esc(t.inst)}"><span class="lbl">${t.web?'Utilisation':'Installation'}</span><span class="v">${esc(t.inst)}</span><span class="cp" style="opacity:1;position:static">copier</span></div>
+      <div class="mlabrow"><span class="mlab">${t.cmds.length} ${t.web?'requêtes à copier':'commandes utiles'}</span><button class="copyall" id="copyall">⧉ Copier tout</button></div>
       ${rows}
-      <div class="mlab" style="margin-top:22px">Référence complète — toutes les options</div>
-      <div class="cmdrow"><div class="d">Page de manuel intégrale</div><div class="cmdline" data-cp="man ${esc(binOf(t))}">${fmtCmd("man "+binOf(t))}<span class="cp">copier</span></div></div>
-      <div class="cmdrow"><div class="d">Aide intégrée : toutes les options</div><div class="cmdline" data-cp="${esc(binOf(t))} --help">${fmtCmd(binOf(t)+" --help")}<span class="cp">copier</span></div></div>
+      ${t.web?`<div class="mlab" style="margin-top:22px">Bon à savoir</div><div class="cmdrow"><div class="d">Ces requêtes se tapent directement dans la barre de recherche. Remplace <b>exemple.com</b> par ton domaine autorisé. Elles marchent aussi sur Bing, DuckDuckGo et Yandex (syntaxe proche). Pour aller plus loin, la Google Hacking Database recense des milliers de dorks classés.</div></div>`:`<div class="mlab" style="margin-top:22px">Référence complète — toutes les options</div><div class="cmdrow"><div class="d">Page de manuel intégrale</div><div class="cmdline" data-cp="man ${esc(binOf(t))}">${fmtCmd("man "+binOf(t))}<span class="cp">copier</span></div></div><div class="cmdrow"><div class="d">Aide intégrée : toutes les options</div><div class="cmdline" data-cp="${esc(binOf(t))} --help">${fmtCmd(binOf(t)+" --help")}<span class="cp">copier</span></div></div>`}
     </div>`;
   modal.querySelectorAll('[data-cp]').forEach(el=>el.onclick=()=>copy(el.dataset.cp));
   modal.querySelector('#copyall').onclick=()=>copy(allTxt,'toutes les commandes copiées ✓');
